@@ -1,0 +1,9 @@
+db:
+  build: db
+  ports:
+    - "3306:3306"
+  command: --default-time-zone="+9:00" --character-set-server=utf8mb4 --general-log-file=/var/lib/mysql/general.log --general-log=1
+redis:
+  image: redis
+  ports:
+    - "6379:6379"
