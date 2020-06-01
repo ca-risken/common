@@ -1,10 +1,14 @@
-.PHONY: all clean start stop log login
+.PHONY: all clean network start stop log login
 all: login
 
 clean:
+	docker network rm local-shared
 	docker-compose down --volumes --rmi all
 
-start:
+network:
+	@if [ -z "`docker network ls | grep local-shared`" ]; then docker network create local-shared; fi
+
+start: network
 	docker-compose up -d --build
 
 stop:
