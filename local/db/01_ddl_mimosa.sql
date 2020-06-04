@@ -61,6 +61,7 @@ CREATE TABLE finding (
   finding_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   description VARCHAR(200) NULL,
   data_source VARCHAR(64) NOT NULL,
+  data_source_id VARCHAR(255) NOT NULL,
   resource_name TEXT NOT NULL,
   project_id INT UNSIGNED NULL,
   original_score FLOAT(5,2) UNSIGNED NOT NULL,
@@ -69,7 +70,7 @@ CREATE TABLE finding (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(finding_id),
-  INDEX idx_data_source(data_source),
+  UNIQUE KEY uidx_data_source (project_id, data_source, data_source_id),
   INDEX idx_project_id(project_id),
   INDEX idx_resource_name(resource_name(255))
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
@@ -82,6 +83,7 @@ CREATE TABLE finding_tag (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(finding_tag_id),
+  UNIQUE KEY uidx_finding_tag (finding_id, tag_key),
   INDEX idx_tag_key(tag_key)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
@@ -92,6 +94,7 @@ CREATE TABLE resource (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(resource_id),
+  UNIQUE KEY uidx_resource (project_id, resource_name(255)),
   INDEX idx_project_id(project_id),
   INDEX idx_resource_name(resource_name(255))
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
@@ -104,6 +107,7 @@ CREATE TABLE resource_tag (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(resource_tag_id),
+  UNIQUE KEY uidx_resource_tag (resource_id, tag_key),
   INDEX idx_tag_key(tag_key)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
