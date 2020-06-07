@@ -62,7 +62,7 @@ CREATE TABLE finding (
   description VARCHAR(200) NULL,
   data_source VARCHAR(64) NOT NULL,
   data_source_id VARCHAR(255) NOT NULL,
-  resource_name TEXT NOT NULL,
+  resource_name VARCHAR(255) NOT NULL,
   project_id INT UNSIGNED NULL,
   original_score FLOAT(5,2) UNSIGNED NOT NULL,
   score FLOAT(3,2) UNSIGNED NULL,
@@ -71,8 +71,7 @@ CREATE TABLE finding (
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(finding_id),
   UNIQUE KEY uidx_data_source (project_id, data_source, data_source_id),
-  INDEX idx_project_id(project_id),
-  INDEX idx_resource_name(resource_name(255))
+  INDEX idx_resource_name(resource_name)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE finding_tag (
@@ -83,20 +82,17 @@ CREATE TABLE finding_tag (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(finding_tag_id),
-  UNIQUE KEY uidx_finding_tag (finding_id, tag_key),
-  INDEX idx_tag_key(tag_key)
+  UNIQUE KEY uidx_finding_tag (finding_id, tag_key)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE resource (
   resource_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  resource_name TEXT NOT NULL,
+  resource_name VARCHAR(255) NOT NULL,
   project_id INT UNSIGNED NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(resource_id),
-  UNIQUE KEY uidx_resource (project_id, resource_name(255)),
-  INDEX idx_project_id(project_id),
-  INDEX idx_resource_name(resource_name(255))
+  UNIQUE KEY uidx_resource (project_id, resource_name)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE resource_tag (
@@ -149,7 +145,7 @@ CREATE TABLE alert_rule (
   name VARCHAR(200) NULL,
   project_id INT UNSIGNED NULL,
   score FLOAT(3,2) UNSIGNED NULL,
-  resource_name TEXT NULL,
+  resource_name VARCHAR(255) NULL,
   tag_key VARCHAR(64) NOT NULL,
   tag_value VARCHAR(200) NOT NULL,
   finding_cnt INT UNSIGNED NULL,
