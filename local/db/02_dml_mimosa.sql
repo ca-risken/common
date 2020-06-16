@@ -8,8 +8,8 @@ INSERT INTO project(project_id, name) VALUES
 
 INSERT INTO user(user_id, name, actevated) VALUES
   (1001, 'alice', 'true'),
-  (1002, 'bob', 'false'),
-  (1003, 'john', 'false');
+  (1002, 'bob', 'true'),
+  (1003, 'john', 'true');
 
 INSERT INTO user_role(user_id, role_id, project_id) VALUES
   (1001, 1001, 1001),
