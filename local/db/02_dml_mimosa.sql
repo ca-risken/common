@@ -61,13 +61,10 @@ INSERT INTO aws_data_source(aws_data_source_id, data_source, max_score) VALUES
   (1002, 'aws:access-analyzer', 1.0),
   (1003, 'aws:iam-admin', 1.0);
 
-INSERT INTO aws_role(aws_role_id, name, assume_role_arn, external_id, activated) VALUES
-  (1001, 'AWS Organization role', 'arn:aws:iam::123456789012:role/role-name', '', 'true');
-
-INSERT INTO aws_rel_data_source(aws_id, aws_data_source_id, aws_role_id, project_id) VALUES
-  (1001, 1001, 1001, 1001),
-  (1001, 1002, 1001, 1001),
-  (1001, 1003, 1001, 1001);
+INSERT INTO aws_rel_data_source(aws_id, aws_data_source_id, project_id, assume_role_arn, external_id) VALUES
+  (1001, 1001, 1001, 'arn:aws:iam::123456789012:role/role-name', ''),
+  (1001, 1002, 1001, 'arn:aws:iam::123456789012:role/role-name', ''),
+  (1001, 1003, 1001, 'arn:aws:iam::123456789012:role/role-name', '');
 
 
 commit;
