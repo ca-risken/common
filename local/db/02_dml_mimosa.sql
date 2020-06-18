@@ -3,6 +3,8 @@ set character_set_client = utf8mb4;
 
 use mimosa;
 
+-- CORE ------------------------------------------------
+
 INSERT INTO project(project_id, name) VALUES
   (1001, 'project-a');
 
@@ -48,5 +50,24 @@ INSERT INTO resource(resource_id, resource_name, project_id) VALUES
 INSERT INTO resource_tag(resource_tag_id, resource_id, project_id, tag_key, tag_value) VALUES
   (1001, 1001, 1001, 'key1', "value"),
   (1002, 1001, 1001, 'key2', "value");
+
+-- AWS ------------------------------------------------
+
+INSERT INTO aws(aws_id, name, project_id, aws_account_id) VALUES
+  (1001, 'account-a', 1001, '123456789012');
+
+INSERT INTO aws_data_source(aws_data_source_id, data_source, max_score) VALUES
+  (1001, 'aws:guard-duty', 10.0),
+  (1002, 'aws:access-analyzer', 1.0),
+  (1003, 'aws:iam-admin', 1.0);
+
+INSERT INTO aws_role(aws_role_id, name, assume_role_arn, external_id, activated) VALUES
+  (1001, 'AWS Organization role', 'arn:aws:iam::123456789012:role/role-name', '', 'true');
+
+INSERT INTO aws_rel_data_source(aws_id, aws_data_source_id, aws_role_id, project_id) VALUES
+  (1001, 1001, 1001, 1001),
+  (1001, 1002, 1001, 1001),
+  (1001, 1003, 1001, 1001);
+
 
 commit;
