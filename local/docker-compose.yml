@@ -9,12 +9,15 @@ services:
       - "3306:3306"
     command: --default-time-zone="+9:00" --character-set-server=utf8mb4 --general-log-file=/var/lib/mysql/general.log --general-log=1
 
-  redis:
-    image: redis
+  sqs:
+    build: sqs
     networks:
       - local-shared
     ports:
-        - "6379:6379"
+      - "9324:9324"
+      - "9325:9325"
+    stdin_open: true
+    tty: true
 
 networks:
   local-shared:
