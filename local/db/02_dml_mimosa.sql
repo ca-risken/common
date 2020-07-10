@@ -8,7 +8,7 @@ use mimosa;
 INSERT INTO project(project_id, name) VALUES
   (1001, 'project-a');
 
-INSERT INTO user(user_id, sub, name, actevated) VALUES
+INSERT INTO user(user_id, sub, name, activated) VALUES
   (1001, 'alice', 'alice', 'true'),
   (1002, 'bob', 'bob', 'true'),
   (1003, 'john', 'john', 'true');

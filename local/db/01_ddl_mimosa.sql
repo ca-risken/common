@@ -7,7 +7,7 @@ CREATE TABLE user (
   user_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   sub VARCHAR(255) NOT NULL,
   name VARCHAR(64) NOT NULL,
-  actevated ENUM('false', 'true') NOT NULL DEFAULT 'true',
+  activated ENUM('false', 'true') NOT NULL DEFAULT 'true',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(user_id),
@@ -118,7 +118,7 @@ CREATE TABLE alert (
   description VARCHAR(200) NULL,
   serverity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
   project_id INT UNSIGNED NULL,
-  actevated ENUM('false', 'true') NOT NULL DEFAULT 'true',
+  activated ENUM('false', 'true') NOT NULL DEFAULT 'true',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(alert_id)
