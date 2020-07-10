@@ -8,10 +8,10 @@ use mimosa;
 INSERT INTO project(project_id, name) VALUES
   (1001, 'project-a');
 
-INSERT INTO user(user_id, name, actevated) VALUES
-  (1001, 'alice', 'true'),
-  (1002, 'bob', 'true'),
-  (1003, 'john', 'true');
+INSERT INTO user(user_id, sub, name, actevated) VALUES
+  (1001, 'alice', 'alice', 'true'),
+  (1002, 'bob', 'bob', 'true'),
+  (1003, 'john', 'john', 'true');
 
 INSERT INTO user_role(user_id, role_id, project_id) VALUES
   (1001, 1001, 1001),
