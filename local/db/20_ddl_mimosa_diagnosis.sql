@@ -30,5 +30,5 @@ CREATE TABLE rel_diagnosis_data_source (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(rel_diagnosis_data_source_id),
-  UNIQUE KEY project_by_resource (diagnosis_id,diagnosis_data_source_id,jira_id)
+  UNIQUE KEY project_by_resource (diagnosis_id,diagnosis_data_source_id,jira_id,jira_key,record_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
