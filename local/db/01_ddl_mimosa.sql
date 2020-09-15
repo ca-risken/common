@@ -119,7 +119,7 @@ CREATE TABLE alert (
   alert_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   alert_condition_id INT UNSIGNED NOT NULL,
   description VARCHAR(200) NULL,
-  serverity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
+  severity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
   project_id INT UNSIGNED NULL,
   activated ENUM('false', 'true') NOT NULL DEFAULT 'true',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -127,11 +127,32 @@ CREATE TABLE alert (
   PRIMARY KEY(alert_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
+CREATE TABLE alert_history (
+  alert_history_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  history_type ENUM('created', 'updated', 'deleted') NOT NULL,
+  alert_id INT UNSIGNED NOT NULL,
+  description VARCHAR(200) NULL,
+  severity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
+  project_id INT UNSIGNED NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(alert_history_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE rel_alert_finding (
+  alert_id INT UNSIGNED NOT NULL,
+  finding_id INT UNSIGNED NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(alert_id, finding_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+
 CREATE TABLE alert_condition (
   alert_condition_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   description VARCHAR(200) NULL,
-  serverity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
+  severity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
   project_id INT UNSIGNED NULL,
+  and_or ENUM('and', 'or') NOT NULL DEFAULT 'and',
   enabled ENUM('false', 'true') NOT NULL DEFAULT 'true',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -142,7 +163,6 @@ CREATE TABLE alert_cond_rule (
   alert_condition_id INT UNSIGNED NOT NULL,
   alert_rule_id INT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NULL,
-  and_or ENUM('and', 'or') NOT NULL DEFAULT 'and',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(alert_condition_id, alert_rule_id)
@@ -152,35 +172,25 @@ CREATE TABLE alert_rule (
   alert_rule_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(200) NULL,
   project_id INT UNSIGNED NULL,
-  score FLOAT(3,2) UNSIGNED NULL,
+  score FLOAT(3,2) UNSIGNED NOT NULL,
   resource_name VARCHAR(255) NULL,
-  tag_key VARCHAR(64) NOT NULL,
-  tag_value VARCHAR(200) NOT NULL,
-  finding_cnt INT UNSIGNED NULL,
+  tag VARCHAR(64) NULL,
+  finding_cnt INT UNSIGNED NOT NULL DEFAULT 1,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(alert_rule_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
-CREATE TABLE alert_cond_action (
+CREATE TABLE alert_cond_notification (
   alert_condition_id INT UNSIGNED NOT NULL,
-  alert_action_id INT UNSIGNED NOT NULL,
+  notification_id INT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NULL,
+  cache_second INT UNSIGNED NOT NULL DEFAULT 1800,
+  notified_at DATETIME NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(alert_condition_id, alert_action_id)
+  PRIMARY KEY(alert_condition_id, notification_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-
-CREATE TABLE alert_action (
-  alert_action_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  name VARCHAR(200) NULL,
-  project_id INT UNSIGNED NULL,
-  notification_id INT UNSIGNED NULL,
-  casche_secound INT UNSIGNED NOT NULL DEFAULT 1800,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(alert_action_id)
-) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE notification (
   notification_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
