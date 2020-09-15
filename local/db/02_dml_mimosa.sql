@@ -51,6 +51,38 @@ INSERT INTO resource_tag(resource_tag_id, resource_id, project_id, tag_key, tag_
   (1001, 1001, 1001, 'key1', "value"),
   (1002, 1001, 1001, 'key2', "value");
 
+INSERT INTO alert_condition(alert_condition_id, description, severity, project_id, and_or, enabled) VALUES
+  (1001, 'test_alert_condition', 'high', 1001, 'and', 'true'),
+  (1002, 'test_alert_condition_2', 'medium', 1001, 'or', 'false');
+
+INSERT INTO alert(alert_id, alert_condition_id, description, severity, project_id, activated) VALUES
+  (1001, 1001, 'test_alert', 'high', 1001, true),
+  (1002, 1001, 'test_alert_2', 'medium', 1001, true);
+
+INSERT INTO alert_history(alert_history_id, history_type, alert_id, description, severity, project_id) VALUES
+  (1001, 'created', 1001, 'test_alert_history', 'high', 1001),
+  (1002, 'deleted', 1001, 'test_alert_history_2', 'high', 1001);
+
+INSERT INTO rel_alert_finding(alert_id, finding_id) VALUES
+  (1001, 1001),
+  (1002, 1002);
+
+INSERT INTO alert_rule(alert_rule_id, name, project_id, score, resource_name, tag, finding_cnt) VALUES
+  (1001, 'test_alert_rule', 1001, 1.0, '', '', 1),
+  (1002, 'test_alert_rule_2', 1001, 1.0, 'test', '', 1);
+
+INSERT INTO alert_cond_rule(alert_condition_id, alert_rule_id, project_id) VALUES
+  (1001, 1001, 1001),
+  (1002, 1002, 1001);
+
+INSERT INTO notification(notification_id, name, project_id, type, notify_setting) VALUES
+  (1001, 'test_notification', 1001, 'slack', '{"webhook_url":"http://hogehoge.com/fuga"}'),
+  (1002, 'test_notification_2', 1001, 'slack', '{"webhook_url":"http://hogehoge2.com/fuga2"}');
+
+INSERT INTO alert_cond_notification(alert_condition_id, notification_id, project_id, cache_second, notified_at) VALUES
+  (1001, 1001, 1001, 1800, '2020-09-01 16:00:00'),
+  (1002, 1002, 1001, 1800, '2020-09-02 16:00:00');
+
 -- AWS ------------------------------------------------
 
 INSERT INTO aws(aws_id, name, project_id, aws_account_id) VALUES
