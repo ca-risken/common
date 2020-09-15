@@ -63,9 +63,9 @@ INSERT INTO alert_history(alert_history_id, history_type, alert_id, description,
   (1001, 'created', 1001, 'test_alert_history', 'high', 1001),
   (1002, 'deleted', 1001, 'test_alert_history_2', 'high', 1001);
 
-INSERT INTO rel_alert_finding(alert_id, finding_id) VALUES
-  (1001, 1001),
-  (1002, 1002);
+INSERT INTO rel_alert_finding(alert_id, finding_id, project_id) VALUES
+  (1001, 1001, 1001),
+  (1002, 1002, 1001);
 
 INSERT INTO alert_rule(alert_rule_id, name, project_id, score, resource_name, tag, finding_cnt) VALUES
   (1001, 'test_alert_rule', 1001, 1.0, '', '', 1),
