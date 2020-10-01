@@ -21,4 +21,4 @@ log:
 	docker-compose logs -f
 
 login:
-	mysql -h127.0.0.1 -uroot -Dmimosa
+	mysql -h127.0.0.1 -uroot -Dmimosa --default-character-set=utf8
