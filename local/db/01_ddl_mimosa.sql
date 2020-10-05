@@ -84,12 +84,12 @@ CREATE TABLE finding_tag (
   finding_tag_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   finding_id BIGINT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NULL,
-  tag_key VARCHAR(64) NOT NULL,
-  tag_value VARCHAR(200) NOT NULL,
+  tag VARCHAR(64) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(finding_tag_id),
-  UNIQUE KEY uidx_finding_tag (finding_id, tag_key)
+  UNIQUE KEY uidx_finding_tag (finding_id, tag),
+  INDEX idx_finding_tag(tag)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE resource (
@@ -106,13 +106,12 @@ CREATE TABLE resource_tag (
   resource_tag_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   resource_id BIGINT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NULL,
-  tag_key VARCHAR(64) NOT NULL,
-  tag_value VARCHAR(200) NOT NULL,
+  tag VARCHAR(64) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(resource_tag_id),
-  UNIQUE KEY uidx_resource_tag (resource_id, tag_key),
-  INDEX idx_tag_key(tag_key)
+  UNIQUE KEY uidx_resource_tag (resource_id, tag),
+  INDEX idx_resource_tag(tag)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE alert (
@@ -233,6 +232,9 @@ CREATE TABLE aws_rel_data_source (
   project_id INT UNSIGNED NOT NULL,
   assume_role_arn VARCHAR(255) NOT NULL,
   external_id VARCHAR(255) NULL,
+  status ENUM('OK' ,'configured', 'not_configured', 'error') NOT NULL DEFAULT 'not_configured',
+  status_detail VARCHAR(255) NULL,
+  scan_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(aws_id, aws_data_source_id)
