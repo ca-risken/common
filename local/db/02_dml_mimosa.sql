@@ -56,8 +56,8 @@ INSERT INTO resource_tag(resource_tag_id, resource_id, project_id, tag) VALUES
   (1001, 1001, 1001, 'tag1');
 
 INSERT INTO alert_condition(alert_condition_id, description, severity, project_id, and_or, enabled) VALUES
-  (1001, 'test_alert_condition', 'high', 1001, 'and', 'true'),
-  (1002, 'test_alert_condition_2', 'medium', 1001, 'or', 'false');
+  (1001, 'test_alert_condition', 'high', 1001, 'and', true),
+  (1002, 'test_alert_condition_2', 'medium', 1001, 'or', false);
 
 INSERT INTO alert(alert_id, alert_condition_id, description, severity, project_id, activated) VALUES
   (1001, 1001, 'test_alert', 'high', 1001, true),
