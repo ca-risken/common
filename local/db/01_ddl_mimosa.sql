@@ -120,7 +120,7 @@ CREATE TABLE alert (
   description VARCHAR(200) NULL,
   severity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
   project_id INT UNSIGNED NULL,
-  activated ENUM('false', 'true') NOT NULL DEFAULT 'true',
+  activated boolean NOT NULL DEFAULT true,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(alert_id)
