@@ -2,7 +2,6 @@ CREATE DATABASE IF NOT EXISTS mimosa DEFAULT CHARACTER SET utf8mb4 COLLATE utf8m
 use mimosa;
 
 -- CORE ------------------------------------------------
-
 CREATE TABLE user (
   user_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   sub VARCHAR(255) NOT NULL,
@@ -205,7 +204,6 @@ CREATE TABLE notification (
 
 
 -- AWS ------------------------------------------------
-
 CREATE TABLE aws (
   aws_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(200) NULL,
@@ -238,4 +236,71 @@ CREATE TABLE aws_rel_data_source (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(aws_id, aws_data_source_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+-- OSINT ------------------------------------------------
+CREATE TABLE osint (
+  osint_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT UNSIGNED NOT NULL,
+  name VARCHAR(200) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(osint_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE osint_data_source (
+  osint_data_source_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(50) NOT NULL,
+  description VARCHAR(200) NOT NULL,
+  max_score FLOAT(5,2) UNSIGNED NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(osint_data_source_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE osint_result (
+  osint_result_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  osint_data_source_id INT UNSIGNED NOT NULL,
+  osint_id INT UNSIGNED NOT NULL,
+  project_id INT UNSIGNED NOT NULL,
+  resource_type VARCHAR(50) NOT NULL,
+  resource_name VARCHAR(200) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(osint_result_id),
+  UNIQUE KEY project_by_resource (osint_id,osint_data_source_id,resource_type,resource_name)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+-- DIAGNOSIS ------------------------------------------------
+CREATE TABLE diagnosis (
+  diagnosis_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT UNSIGNED NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(diagnosis_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE diagnosis_data_source (
+  diagnosis_data_source_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(50) NOT NULL,
+  description VARCHAR(200) NOT NULL,
+  max_score FLOAT(5,2) UNSIGNED NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(diagnosis_data_source_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE rel_diagnosis_data_source (
+  rel_diagnosis_data_source_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  diagnosis_data_source_id INT UNSIGNED NOT NULL,
+  diagnosis_id INT UNSIGNED NOT NULL,
+  project_id INT UNSIGNED NOT NULL,
+  record_id VARCHAR(50),
+  jira_id VARCHAR(50),
+  jira_key VARCHAR(50),
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(rel_diagnosis_data_source_id),
+  UNIQUE KEY project_by_resource (diagnosis_id,diagnosis_data_source_id,jira_id,jira_key,record_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
