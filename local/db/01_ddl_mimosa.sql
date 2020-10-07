@@ -152,7 +152,7 @@ CREATE TABLE alert_condition (
   severity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
   project_id INT UNSIGNED NULL,
   and_or ENUM('and', 'or') NOT NULL DEFAULT 'and',
-  enabled ENUM('false', 'true') NOT NULL DEFAULT 'true',
+  enabled boolean NOT NULL DEFAULT true,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(alert_condition_id)
