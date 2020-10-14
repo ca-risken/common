@@ -3,15 +3,9 @@ set character_set_client = utf8mb4;
 
 use mimosa;
 
--- DIAGNOSIS ------------------------------------------------
-INSERT INTO diagnosis(diagnosis_id, project_id, name) VALUES
-  (1, 1001, 'project-a-diagnosis'),
-  (2, 1001, 'project-a-diagnosis_2'),
-  (3, 1001, 'project-a-diagnosis_3');
-
-INSERT INTO rel_diagnosis_data_source(rel_diagnosis_data_source_id, diagnosis_data_source_id, diagnosis_id, project_id, record_id, jira_id, jira_key) VALUES
-  (1, 1, 1, 1001, '1353', '', ''),
-  (2, 1, 1, 1001, '', '10241', ''),
-  (3, 1, 1, 1001, '', '', 'OC202001');
+INSERT INTO jira_setting(jira_setting_id, name, diagnosis_data_source_id, project_id, identity_field, identity_value, jira_id, jira_key, status, status_detail, scan_at) VALUES
+  (1001, "test-a", 1001, 1001, 'customfield_10035', '1393', '', '', 'CONFIGURED', '', null),
+  (1002, "test-b", 1001, 1001, '', '', '10241', '', 'CONFIGURED', '', null),
+  (1003, "test-c", 1001, 1001, '', '', '', 'OC202001', 'CONFIGURED', '', null);
 
 commit;
