@@ -60,14 +60,24 @@ INSERT INTO alert_condition(alert_condition_id, description, severity, project_i
 
 INSERT INTO alert(alert_id, alert_condition_id, description, severity, project_id, activated) VALUES
   (1001, 1001, 'test_alert', 'high', 1001, true),
-  (1002, 1001, 'test_alert_2', 'medium', 1001, true);
+  (1002, 1001, 'test_alert_2', 'medium', 1001, true),
+  (1003, 1001, 'test_alert_3', 'low', 1001, true);
 
 INSERT INTO alert_history(alert_history_id, history_type, alert_id, description, severity, project_id) VALUES
   (1001, 'created', 1001, 'test_alert_history', 'high', 1001),
-  (1002, 'deleted', 1001, 'test_alert_history_2', 'high', 1001);
+  (1002, 'deleted', 1001, 'test_alert_history_2', 'high', 1001),
+  (1003, 'created', 1002, 'test_alert_history', 'low', 1001),
+  (1004, 'updated', 1002, 'test_alert_history_2', 'low', 1001),
+  (1005, 'updated', 1002, 'test_alert_history_2', 'medium', 1001),
+  (1006, 'updated', 1002, 'test_alert_history_2', 'medium', 1001),
+  (1007, 'updated', 1002, 'test_alert_history_2', 'high', 1001),
+  (1008, 'updated', 1002, 'test_alert_history_2', 'medium', 1001),
+  (1009, 'updated', 1002, 'test_alert_history_2', 'low', 1001),
+  (1010, 'deleted', 1002, 'test_alert_history_2', 'high', 1001);
 
 INSERT INTO rel_alert_finding(alert_id, finding_id, project_id) VALUES
   (1001, 1001, 1001),
+  (1001, 1002, 1001),
   (1002, 1002, 1001);
 
 INSERT INTO alert_rule(alert_rule_id, name, project_id, score, resource_name, tag, finding_cnt) VALUES
