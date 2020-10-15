@@ -45,14 +45,18 @@ INSERT INTO finding(finding_id, description, data_source, data_source_id, resour
   (1003, 'desc-1003', 'aws:iam-checker',     'iam-checker-0001',     'arn:aws:iam::123456789012:user/alice', 1001, 100.00, 1.00, '{"data":{"key":"value"}}');
 
 INSERT INTO finding_tag(finding_tag_id, finding_id, project_id, tag) VALUES
-  (1001, 1001, 1001, "tag");
+  (1001, 1001, 1001, "tag"),
+  (1002, 1001, 1001, "tag:key"),
+  (1003, 1002, 1001, "tag:key");
 
 INSERT INTO resource(resource_id, resource_name, project_id) VALUES
   (1001, 'arn:aws:s3:::example-bucket',          1001),
   (1002, 'arn:aws:iam::123456789012:user/alice', 1001);
 
 INSERT INTO resource_tag(resource_tag_id, resource_id, project_id, tag) VALUES
-  (1001, 1001, 1001, 'tag1');
+  (1001, 1001, 1001, 'tag1'),
+  (1002, 1001, 1001, "tag:key"),
+  (1003, 1002, 1001, "tag:key");
 
 INSERT INTO alert_condition(alert_condition_id, description, severity, project_id, and_or, enabled) VALUES
   (1001, 'test_alert_condition', 'high', 1001, 'and', true),
