@@ -40,9 +40,9 @@ INSERT INTO policy(policy_id, name, project_id, action_ptn, resource_ptn) VALUES
   (1004, 'admin-policy', 1002, '.*', '.*');
 
 INSERT INTO finding(finding_id, description, data_source, data_source_id, resource_name, project_id, original_score, score, data) VALUES
-  (1001, 'desc-1001', 'aws:guardduty',       'guardduty-0001',       'arn:aws:s3:::example-bucket',          1001, 100.00, 1.00, '{"data":{"key":"value"}}'),
-  (1002, 'desc-1002', 'aws:access-analizer', 'access-analizer-0001', 'arn:aws:s3:::example-bucket',          1001, 99.05, 0.99,  '{"data":{"key":"value"}}'),
-  (1003, 'desc-1003', 'aws:iam-checker',     'iam-checker-0001',     'arn:aws:iam::123456789012:user/alice', 1001, 100.00, 1.00, '{"data":{"key":"value"}}');
+  (1001, 'desc-1001', 'aws:guard-duty', 'guard-duty-0001', 'arn:aws:s3:::example-bucket', 1001, 100.00, 1.00, '{"data":{"key":"value"}}'),
+  (1002, 'desc-1002', 'aws:guard-duty', 'guard-duty-0002', 'arn:aws:s3:::example-bucket', 1001, 99.05, 0.99,  '{"data":{"key":"value"}}'),
+  (1003, 'desc-1003', 'diagnosis:jira', 'jira-0001',       'Cross Site Sciripting',       1001, 100.00, 1.00, '{"data":{"key":"value"}}');
 
 INSERT INTO finding_tag(finding_tag_id, finding_id, project_id, tag) VALUES
   (1001, 1001, 1001, "tag"),
