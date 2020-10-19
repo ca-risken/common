@@ -9,11 +9,11 @@ INSERT INTO aws_data_source(aws_data_source_id, data_source, max_score) VALUES
 
 -- OSINT ------------------------------------------------
 INSERT INTO osint_data_source(osint_data_source_id, name, description, max_score) VALUES
-  (1001, 'intrigue', 'intrigue', 10.0),
-  (1002, 'tmp_osint', 'this_datasource_does_not exist.', 10.0);
+  (1001, 'osint:intrigue', 'intrigue', 10.0),
+  (1002, 'osint:tmp_osint', 'this_datasource_does_not exist.', 10.0);
 
 -- DIAGNOSIS ------------------------------------------------
 INSERT INTO diagnosis_data_source(diagnosis_data_source_id, name, description, max_score) VALUES
-  (1001, 'diagnnosis:jira', 'jira', 10.0);
+  (1001, 'diagnosis:jira', 'jira', 10.0);
 
 commit;
