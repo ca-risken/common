@@ -3,7 +3,6 @@ all: login
 
 clean:
 	docker-compose down --volumes --rmi all
-	docker network rm local-shared
 
 network:
 	@if [ -z "`docker network ls | grep local-shared`" ]; then docker network create local-shared; fi

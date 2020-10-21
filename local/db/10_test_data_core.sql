@@ -59,7 +59,7 @@ INSERT INTO alert(alert_id, alert_condition_id, description, severity, project_i
   (1003, 1001, 'test_alert_3', 'low', 1001, 'ACTIVE');
 
 INSERT INTO alert_history(alert_history_id, history_type, alert_id, description, severity,finding_history, project_id) VALUES
-  (1001, 'created', 1001, 'test_alert_history', 'high','{"finding_id":[1001,1002]}', 1001),
+  (1001, 'created', 1001, 'test_alert_history', 'high','{"finding_id":[1001,1002,1003,1004,1005,1006]}', 1001),
   (1002, 'deleted', 1001, 'test_alert_history_2', 'high','{"finding_id":[]}', 1001),
   (1003, 'created', 1002, 'test_alert_history', 'low','{"finding_id":[1001,1002]}', 1001),
   (1009, 'updated', 1002, 'test_alert_history_2', 'low','{"finding_id":[1001]}', 1001),
