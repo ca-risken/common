@@ -119,7 +119,7 @@ CREATE TABLE alert (
   description VARCHAR(200) NULL,
   severity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
   project_id INT UNSIGNED NULL,
-  activated boolean NOT NULL DEFAULT true,
+  status ENUM('ACTIVE', 'PENDING', 'DEACTIVE') NOT NULL DEFAULT 'ACTIVE',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(alert_id)
@@ -131,6 +131,7 @@ CREATE TABLE alert_history (
   alert_id INT UNSIGNED NOT NULL,
   description VARCHAR(200) NULL,
   severity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
+  finding_history JSON NULL,
   project_id INT UNSIGNED NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -258,17 +259,19 @@ CREATE TABLE osint_data_source (
   PRIMARY KEY(osint_data_source_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
-CREATE TABLE osint_result (
-  osint_result_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+CREATE TABLE rel_osint_data_source (
+  rel_osint_data_source_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   osint_data_source_id INT UNSIGNED NOT NULL,
   osint_id INT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
   resource_type VARCHAR(50) NOT NULL,
   resource_name VARCHAR(200) NOT NULL,
+  status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'NOT_CONFIGURED', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
+  status_detail VARCHAR(255) NULL,
+  scan_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(osint_result_id),
-  UNIQUE KEY project_by_resource (osint_id,osint_data_source_id,resource_type,resource_name)
+  PRIMARY KEY(rel_osint_data_source_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 -- DIAGNOSIS ------------------------------------------------
