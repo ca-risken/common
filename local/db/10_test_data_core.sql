@@ -14,30 +14,21 @@ INSERT INTO user(user_id, sub, name, activated) VALUES
   (1003, 'john', 'john', 'true');
 
 INSERT INTO user_role(user_id, role_id, project_id) VALUES
-  (1001, 1001, 1001),
-  (1001, 1004, 1002),
-  (1002, 1002, 1001),
-  (1003, 1003, 1001);
+  (1001, 1, null),
+  (1002, 1001, 1001),
+  (1003, 1002, 1001);
 
 INSERT INTO role(role_id, name, project_id) VALUES
-  (1, 'system-admin', null),
   (1001, 'project-a-admin', 1001),
-  (1002, 'project-a-viewer', 1001),
-  (1003, 'project-a-aws-guardduty', 1001),
-  (1004, 'project-b-admin', 1002);
+  (1002, 'project-a-viewer', 1001);
 
 INSERT INTO role_policy(role_id, policy_id, project_id) VALUES
   (1001, 1001, 1001),
-  (1002, 1002, 1001),
-  (1003, 1003, 1001),
-  (1004, 1004, 1002);
+  (1002, 1002, 1001);
 
 INSERT INTO policy(policy_id, name, project_id, action_ptn, resource_ptn) VALUES
-  (1, 'system-admin-policy', null, '.*', '.*'),
   (1001, 'admin-policy', 1001, '.*', '.*'),
-  (1002, 'viewer-policy', 1001, '(/List|/Get|/Describe)', '.*'),
-  (1003, 'aws-guardduty-policy', 1001, '^finding/', '^aws:guardduty/'),
-  (1004, 'admin-policy', 1002, '.*', '.*');
+  (1002, 'viewer-policy', 1001, '^.*/(get-|list-|describe-|show-)', '.*');
 
 INSERT INTO finding(finding_id, description, data_source, data_source_id, resource_name, project_id, original_score, score, data) VALUES
   (1001, 'desc-1001', 'aws:guard-duty', 'guard-duty-0001', 'arn:aws:s3:::example-bucket', 1001, 100.00, 1.00, '{"data":{"key":"value"}}'),
