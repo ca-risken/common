@@ -15,7 +15,8 @@ INSERT INTO role_policy(role_id, policy_id, project_id) VALUES
 
 -- AWS ------------------------------------------------
 INSERT INTO aws_data_source(aws_data_source_id, data_source, max_score) VALUES
-  (1001, 'aws:guard-duty', 10.0);
+  (1001, 'aws:guard-duty', 10.0),
+  (1002, 'aws:access-analyzer', 1.0);
 
 -- OSINT ------------------------------------------------
 INSERT INTO osint_data_source(osint_data_source_id, name, description, max_score) VALUES
