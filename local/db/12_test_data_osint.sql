@@ -12,13 +12,9 @@ INSERT INTO rel_osint_data_source(rel_osint_data_source_id, osint_data_source_id
   (1001, 1001, 1001, 1001, 'CONFIGURED'),
   (1002, 1001, 1001, 1001, 'CONFIGURED');
 
-INSERT INTO rel_osint_detect_word(rel_osint_detect_word_id,rel_osint_data_source_id,osint_detect_word_id, project_id) VALUES
-  (1001, 1001, 1001, 1001),
-  (1002, 1001, 1002, 1001);
-
-INSERT INTO osint_detect_word(osint_detect_word_id,word,project_id) VALUES
-  (1001, 'jenkins', 1001),
-  (1002, 'stg', 1001),
-  (1003, 'admin', 1001);
+INSERT INTO osint_detect_word(osint_detect_word_id,rel_osint_data_source_id,word,project_id) VALUES
+  (1001, 1001, 'jenkins', 1001),
+  (1002, 1001, 'stg', 1001),
+  (1003, 1001, 'admin', 1001);
 
 commit;

@@ -273,18 +273,9 @@ CREATE TABLE rel_osint_data_source (
   PRIMARY KEY(rel_osint_data_source_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
-CREATE TABLE rel_osint_detect_word (
-  rel_osint_detect_word_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  rel_osint_data_source_id INT UNSIGNED NOT NULL,
-  osint_detect_word_id INT UNSIGNED NOT NULL,
-  project_id INT UNSIGNED NOT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(rel_osint_detect_word_id)
-) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
-
 CREATE TABLE osint_detect_word (
   osint_detect_word_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  rel_osint_data_source_id INT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
   word VARCHAR(50) NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
