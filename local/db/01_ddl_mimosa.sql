@@ -151,7 +151,7 @@ CREATE TABLE alert_condition (
   alert_condition_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   description VARCHAR(200) NULL,
   severity ENUM('high', 'medium', 'low') NOT NULL DEFAULT 'low',
-  project_id INT UNSIGNED NULL,
+  project_id INT UNSIGNED NOT NULL,
   and_or ENUM('and', 'or') NOT NULL DEFAULT 'and',
   enabled boolean NOT NULL DEFAULT true,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -171,7 +171,7 @@ CREATE TABLE alert_cond_rule (
 CREATE TABLE alert_rule (
   alert_rule_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(200) NULL,
-  project_id INT UNSIGNED NULL,
+  project_id INT UNSIGNED NOT NULL,
   score FLOAT(3,2) UNSIGNED NOT NULL,
   resource_name VARCHAR(255) NULL,
   tag VARCHAR(64) NULL,
@@ -195,7 +195,7 @@ CREATE TABLE alert_cond_notification (
 CREATE TABLE notification (
   notification_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(200) NULL,
-  project_id INT UNSIGNED NULL,
+  project_id INT UNSIGNED NOT NULL,
   type VARCHAR(64) NOT NULL,
   notify_setting JSON NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
