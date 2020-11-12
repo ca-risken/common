@@ -203,6 +203,16 @@ CREATE TABLE notification (
   PRIMARY KEY(notification_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
+CREATE TABLE report_finding (
+  report_finding_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  report_date DATE NOT NULL,
+  project_id INT UNSIGNED NOT NULL,
+  data_source VARCHAR(64) NOT NULL,
+  score FLOAT(3,2) UNSIGNED NOT NULL,
+  count INT UNSIGNED NOT NULL,
+  PRIMARY KEY(report_finding_id),
+  UNIQUE KEY uidx_report_finding (report_date, project_id, data_source, score)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 -- AWS ------------------------------------------------
 CREATE TABLE aws (
