@@ -293,6 +293,24 @@ CREATE TABLE osint_detect_word (
   PRIMARY KEY(osint_detect_word_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
+CREATE TABLE osint_resource (
+  resource_name VARCHAR(200) NOT NULL,
+  resource_type VARCHAR(50) NOT NULL,
+  related_resource_name VARCHAR(200) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(resource_name,resource_type,related_resource_name)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE osint_resource_status (
+  resource_name VARCHAR(200) NOT NULL,
+  resource_type VARCHAR(50) NOT NULL,
+  scan_at DATETIME NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(resource_name,resource_type)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
 -- DIAGNOSIS ------------------------------------------------
 CREATE TABLE diagnosis_data_source (
   diagnosis_data_source_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
