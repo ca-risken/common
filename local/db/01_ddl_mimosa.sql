@@ -350,7 +350,7 @@ CREATE TABLE code_data_source (
   PRIMARY KEY(code_data_source_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
-CREATE TABLE gitleaks (
+CREATE TABLE code_gitleaks (
   gitleaks_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   code_data_source_id INT UNSIGNED NOT NULL,
   name VARCHAR(64) NULL,
