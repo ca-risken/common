@@ -17,10 +17,4 @@ INSERT INTO osint_detect_word(osint_detect_word_id,rel_osint_data_source_id,word
   (1002, 1001, 'stg', 1001),
   (1003, 1001, 'admin', 1001);
 
-INSERT INTO osint_resource(resource_name,resource_type,related_resource_name) VALUES
-  ('cyberagent.co.jp', 'Domain', 'tech.sge.cyberagent.co.jp');
-
-INSERT INTO osint_resource_status(resource_name,resource_type,scan_at) VALUES
-  ('cyberagent.co.jp', 'Domain','2020-09-01 00:00:00');
-
 commit;

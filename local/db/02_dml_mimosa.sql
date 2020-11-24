@@ -22,7 +22,7 @@ INSERT INTO aws_data_source(aws_data_source_id, data_source, max_score) VALUES
 -- OSINT ------------------------------------------------
 INSERT INTO osint_data_source(osint_data_source_id, name, description, max_score) VALUES
   (1001, 'osint:private-expose', 'subdomain researcher', 10.0),
-  (1002, 'osint:takeover', 'subdomain takeover researcher', 10.0);
+  (1002, 'osint:subdomain', 'researcher about subdomain', 10.0);
 
 -- DIAGNOSIS ------------------------------------------------
 INSERT INTO diagnosis_data_source(diagnosis_data_source_id, name, description, max_score) VALUES
