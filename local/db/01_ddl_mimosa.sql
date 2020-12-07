@@ -342,6 +342,9 @@ CREATE TABLE code_gitleaks (
   repository_pattern VARCHAR(128) NULL,
   github_user VARCHAR(64) NULL,
   personal_access_token VARCHAR(255) NULL,
+  scanPublic ENUM('false', 'true') NOT NULL DEFAULT 'true',
+  scanInternal ENUM('false', 'true') NOT NULL DEFAULT 'true',
+  scanPrivate ENUM('false', 'true') NOT NULL DEFAULT 'false',
   gitleaks_config TEXT NULL,
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'NOT_CONFIGURED', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail VARCHAR(255) NULL,
@@ -350,3 +353,12 @@ CREATE TABLE code_gitleaks (
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(gitleaks_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE code_enterprise_org (
+  gitleaks_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  login VARCHAR(128) NOT NULL,
+  project_id INT UNSIGNED NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(gitleaks_id, login)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
