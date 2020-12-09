@@ -351,7 +351,8 @@ CREATE TABLE code_gitleaks (
   scan_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(gitleaks_id)
+  PRIMARY KEY(gitleaks_id),
+  UNIQUE KEY uidx_code_gitleaks (code_data_source_id, name, project_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE code_enterprise_org (
