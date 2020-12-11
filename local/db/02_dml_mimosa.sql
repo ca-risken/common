@@ -26,7 +26,8 @@ INSERT INTO osint_data_source(osint_data_source_id, name, description, max_score
 
 -- DIAGNOSIS ------------------------------------------------
 INSERT INTO diagnosis_data_source(diagnosis_data_source_id, name, description, max_score) VALUES
-  (1001, 'diagnosis:jira', 'jira', 10.0);
+  (1001, 'diagnosis:jira', 'jira', 10.0),
+  (1002, 'diagnosis:wpscan', 'Vulnerability scan for WordPress', 10.0);
 
 -- CODE ------------------------------------------------
 INSERT INTO code_data_source(code_data_source_id, name, description, max_score) VALUES
