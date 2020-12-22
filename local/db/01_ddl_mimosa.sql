@@ -321,6 +321,19 @@ CREATE TABLE jira_setting (
   PRIMARY KEY(jira_setting_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
+CREATE TABLE wpscan_setting (
+  wpscan_setting_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  diagnosis_data_source_id INT UNSIGNED NOT NULL,
+  project_id INT UNSIGNED NOT NULL,
+  target_url VARCHAR(200),
+  status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'NOT_CONFIGURED', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
+  status_detail VARCHAR(255) NULL,
+  scan_at DATETIME NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(wpscan_setting_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
 -- CODE ------------------------------------------------
 CREATE TABLE code_data_source (
   code_data_source_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
