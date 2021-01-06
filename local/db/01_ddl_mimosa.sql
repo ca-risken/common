@@ -388,18 +388,25 @@ CREATE TABLE google_data_source (
   PRIMARY KEY(google_data_source_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
-CREATE TABLE google_gcp (
+CREATE TABLE gcp (
   gcp_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  google_data_source_id INT UNSIGNED NOT NULL,
   name VARCHAR(64) NULL,
   project_id INT UNSIGNED NOT NULL,
-  gcp_organization_id VARCHAR(128) NULL,
-  gcp_project_id VARCHAR(128) NULL,
+  gcp_project_id VARCHAR(128) NOT  NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(gcp_id),
+  UNIQUE KEY uidx_gcp (project_id, gcp_project_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE gcp_data_source (
+  gcp_id INT UNSIGNED NOT NULL,
+  google_data_source_id INT UNSIGNED NOT NULL,
+  project_id INT UNSIGNED NOT NULL,
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'NOT_CONFIGURED', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail VARCHAR(255) NULL,
   scan_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(gcp_id),
-  UNIQUE KEY uidx_google_gcp (google_data_source_id, name, project_id)
-) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+  PRIMARY KEY(gcp_id, google_data_source_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
