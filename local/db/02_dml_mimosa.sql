@@ -5,13 +5,16 @@ use mimosa;
 
 -- CORE ------------------------------------------------
 INSERT INTO role(role_id, name, project_id) VALUES
-  (1, 'system-admin-role', null);
+  (1, 'system-admin-role', null),
+  (2, 'system-readonly-role', null);
 
 INSERT INTO policy(policy_id, name, project_id, action_ptn, resource_ptn) VALUES
-  (1, 'system-admin-policy', null, '.*', '.*');
+  (1, 'system-admin-policy', null, '.*', '.*'),
+  (2, 'system-readonly-policy', null, '^.*/(list|get|describe)-.*', '.*');
 
 INSERT INTO role_policy(role_id, policy_id, project_id) VALUES
-  (1, 1, null);
+  (1, 1, null),
+  (2, 2, null);
 
 -- AWS ------------------------------------------------
 INSERT INTO aws_data_source(aws_data_source_id, data_source, max_score) VALUES
