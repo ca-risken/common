@@ -42,6 +42,7 @@ INSERT INTO code_data_source(code_data_source_id, name, description, max_score) 
 INSERT INTO google_data_source(google_data_source_id, name, description, max_score) VALUES
   (1001, 'google:asset', 'Cloud Asset Inventory', 1.0),
   (1002, 'google:cloudsploit', 'Aqua CloudSploit for GCP', 1.0),
-  (1003, 'google:scc', 'Security Command Center', 1.0);
+  (1003, 'google:scc', 'Security Command Center', 1.0),
+  (1004, 'google:portscan', 'Portscan for GCP', 10.0);
 
 commit;
