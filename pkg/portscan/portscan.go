@@ -9,7 +9,7 @@ import (
 	"github.com/Ullaakut/nmap/v2"
 )
 
-type nmapResult struct {
+type NmapResult struct {
 	Port         int
 	Protocol     string
 	Target       string
@@ -19,11 +19,11 @@ type nmapResult struct {
 	ScanDetail   map[string]interface{}
 }
 
-func scan(target, protocol string, fPort, tPort int) ([]*nmapResult, error) {
-	var ret []*nmapResult
+func Scan(target, protocol string, fPort, tPort int) ([]*NmapResult, error) {
+	var ret []*NmapResult
 	nmapResults, err := runNmap(target, protocol, fPort, tPort)
 	if err != nil {
-		return []*nmapResult{}, err
+		return []*NmapResult{}, err
 	}
 	for _, result := range nmapResults {
 		_ = result.analyzeResult()
@@ -32,20 +32,20 @@ func scan(target, protocol string, fPort, tPort int) ([]*nmapResult, error) {
 	return ret, nil
 }
 
-func runNmap(target, protocol string, fPort, tPort int) ([]*nmapResult, error) {
-	var nmapResults []*nmapResult
+func runNmap(target, protocol string, fPort, tPort int) ([]*NmapResult, error) {
+	var nmapResults []*NmapResult
 	scanner, err := getScanner(target, protocol, fPort, tPort)
 	if err != nil {
-		return []*nmapResult{}, err
+		return []*NmapResult{}, err
 	}
 
 	result, _, err := scanner.Run()
 	if err != nil {
-		return []*nmapResult{}, err
+		return []*NmapResult{}, err
 	}
 	for _, host := range result.Hosts {
 		for _, port := range host.Ports {
-			nmapResults = append(nmapResults, &nmapResult{
+			nmapResults = append(nmapResults, &NmapResult{
 				Port:     int(port.ID),
 				Protocol: protocol,
 				Target:   target,
@@ -86,7 +86,7 @@ func getScanner(host, protocol string, fPort, tPort int) (*nmap.Scanner, error) 
 	return scanner, nil
 }
 
-func (n *nmapResult) getScore() float32 {
+func (n *NmapResult) GetScore() float32 {
 	status := n.Status
 	protocol := n.Protocol
 	port := n.Port
@@ -105,11 +105,11 @@ func (n *nmapResult) getScore() float32 {
 	}
 }
 
-func (n *nmapResult) getDescription() string {
+func (n *NmapResult) GetDescription() string {
 	return fmt.Sprintf("%v is %v. protocol: %v, port %v", n.Target, n.Status, n.Protocol, n.Port)
 }
 
-func (n *nmapResult) getDataSourceID() string {
+func (n *NmapResult) getDataSourceID() string {
 	input := fmt.Sprintf("%v:%v:%v", n.Target, n.Protocol, n.Port)
 	hash := sha256.Sum256([]byte(input))
 	return hex.EncodeToString(hash[:])

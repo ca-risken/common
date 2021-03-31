@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (n *nmapResult) analyzeResult() error {
+func (n *NmapResult) analyzeResult() error {
 	if n.Status == "closed" {
 		return nil
 	}
