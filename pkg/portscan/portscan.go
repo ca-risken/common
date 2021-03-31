@@ -109,7 +109,7 @@ func (n *NmapResult) GetDescription() string {
 	return fmt.Sprintf("%v is %v. protocol: %v, port %v", n.Target, n.Status, n.Protocol, n.Port)
 }
 
-func (n *NmapResult) getDataSourceID() string {
+func (n *NmapResult) GetDataSourceID() string {
 	input := fmt.Sprintf("%v:%v:%v", n.Target, n.Protocol, n.Port)
 	hash := sha256.Sum256([]byte(input))
 	return hex.EncodeToString(hash[:])
