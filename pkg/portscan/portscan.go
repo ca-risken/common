@@ -64,7 +64,7 @@ func getScanner(host, protocol string, fPort, tPort int) (*nmap.Scanner, error) 
 			nmap.WithPorts(fmt.Sprintf("%v-%v", fPort, tPort)),
 			nmap.WithServiceInfo(),
 			nmap.WithSkipHostDiscovery(),
-			//			nmap.WithSYNScan(),
+			nmap.WithSYNScan(),
 			nmap.WithTimingTemplate(nmap.TimingAggressive),
 		)
 		if err != nil {
@@ -77,7 +77,7 @@ func getScanner(host, protocol string, fPort, tPort int) (*nmap.Scanner, error) 
 		nmap.WithPorts(fmt.Sprintf("%v-%v", fPort, tPort)),
 		nmap.WithServiceInfo(),
 		nmap.WithSkipHostDiscovery(),
-		//		nmap.WithUDPScan(),
+		nmap.WithUDPScan(),
 		nmap.WithTimingTemplate(nmap.TimingAggressive),
 	)
 	if err != nil {
