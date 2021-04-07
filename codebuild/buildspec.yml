@@ -13,7 +13,7 @@ phases:
       - echo "machine github.com" > ~/.netrc
       - echo "login ${GITHUB_USER}" >> ~/.netrc
       - echo "password ${GITHUB_TOKEN}" >> ~/.netrc
-  test:
+  pre_build:
     commands:
       - echo Setting environment variables
       - PKG=${CODEBUILD_SRC_DIR}/pkg
