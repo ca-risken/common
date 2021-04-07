@@ -1,10 +1,7 @@
 package portscan
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
-	"strings"
 
 	"github.com/Ullaakut/nmap/v2"
 )
@@ -39,8 +36,9 @@ func runNmap(target, protocol string, fPort, tPort int) ([]*NmapResult, error) {
 		return []*NmapResult{}, err
 	}
 
-	result, _, err := scanner.Run()
+	result, warn, err := scanner.Run()
 	if err != nil {
+		fmt.Printf("Nmap warning: %v", warn)
 		return []*NmapResult{}, err
 	}
 	for _, host := range result.Hosts {
@@ -84,45 +82,4 @@ func getScanner(host, protocol string, fPort, tPort int) (*nmap.Scanner, error) 
 		return nil, err
 	}
 	return scanner, nil
-}
-
-func (n *NmapResult) GetScore() float32 {
-	status := n.Status
-	protocol := n.Protocol
-	port := n.Port
-	if strings.ToUpper(status) == "CLOSED" || (strings.ToUpper(protocol) == "TCP" && strings.Index(strings.ToUpper(status), "FILTERED") > -1) {
-		return 1.0
-	}
-	if strings.ToUpper(protocol) == "UDP" {
-		return 6.0
-	}
-	switch port {
-	case 22, 3306, 5432, 6379:
-		return 8.0
-	default:
-		score := getScoreByScanDetail(n.ScanDetail)
-		return score
-	}
-}
-
-func (n *NmapResult) GetDescription() string {
-	return fmt.Sprintf("%v is %v. protocol: %v, port %v", n.Target, n.Status, n.Protocol, n.Port)
-}
-
-func (n *NmapResult) GetDataSourceID() string {
-	input := fmt.Sprintf("%v:%v:%v", n.Target, n.Protocol, n.Port)
-	hash := sha256.Sum256([]byte(input))
-	return hex.EncodeToString(hash[:])
-}
-
-func getScoreByScanDetail(detail map[string]interface{}) float32 {
-	val, ok := detail["status"]
-	if !ok {
-		return 6.0
-	}
-	if strings.Index(val.(string), "401") > -1 || strings.Index(val.(string), "403") > -1 {
-		return 1.0
-	}
-	return 6.0
-
 }
