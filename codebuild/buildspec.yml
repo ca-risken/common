@@ -1,0 +1,22 @@
+version: 0.2
+
+env:
+  parameter-store:
+    GITHUB_USER: "/build/GITHUB_USER"
+    GITHUB_TOKEN: "/build/GITHUB_TOKEN"
+
+phases:
+  install:
+    runtime-versions:
+      golang: 1.14
+    commands:
+      - echo "machine github.com" > ~/.netrc
+      - echo "login ${GITHUB_USER}" >> ~/.netrc
+      - echo "password ${GITHUB_TOKEN}" >> ~/.netrc
+  test:
+    commands:
+      - echo Setting environment variables
+      - PKG=${CODEBUILD_SRC_DIR}/pkg
+
+      - echo Testing the sources...
+      - cd ${PKG}/portscan   && go test ./...
