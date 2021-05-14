@@ -22,7 +22,8 @@ INSERT INTO aws_data_source(aws_data_source_id, data_source, max_score) VALUES
   (1002, 'aws:access-analyzer', 1.0),
   (1003, 'aws:admin-checker', 1.0),
   (1004, 'aws:cloudsploit', 10.0),
-  (1005, 'aws:portscan', 10.0);
+  (1005, 'aws:portscan', 10.0),
+  (1006, 'aws:activity', 1.0);
 
 -- OSINT ------------------------------------------------
 INSERT INTO osint_data_source(osint_data_source_id, name, description, max_score) VALUES
