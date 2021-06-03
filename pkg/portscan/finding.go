@@ -74,7 +74,9 @@ func (n *NmapResult) GetScore() float32 {
 		return 6.0
 	}
 	switch port {
-	case 22, 3306, 5432, 6379:
+	case 22:
+		return 6.0
+	case 3306, 5432, 6379:
 		return 8.0
 	default:
 		score := getScoreByScanDetail(n.ScanDetail)
