@@ -117,7 +117,7 @@ func TestGetScore(t *testing.T) {
 			expectScore: 6.0,
 		},
 		{
-			name: "Score: 8.0 tcp/dangerous port",
+			name: "Score: 6.0 tcp/ssh port",
 			nmapResult: &NmapResult{
 				ResourceName: "hogeResource",
 				Target:       "example.com",
@@ -125,7 +125,7 @@ func TestGetScore(t *testing.T) {
 				Status:       "open",
 				Port:         22,
 			},
-			expectScore: 8.0,
+			expectScore: 6.0,
 		},
 		{
 			name: "Score: 8.0 tcp/dangerous port",
@@ -134,7 +134,7 @@ func TestGetScore(t *testing.T) {
 				Target:       "example.com",
 				Protocol:     "tcp",
 				Status:       "open",
-				Port:         22,
+				Port:         3306,
 			},
 			expectScore: 8.0,
 		},
