@@ -464,12 +464,10 @@ CREATE TABLE gcp_data_source (
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 -- USER_INTEGRATION TODO 名前考える------------------------------------------------
-
 CREATE TABLE role_matching ( -- TODO 名前見直し
   external_user_provider_code VARCHAR(255) NOT NULL, -- TODO 名前と型の見直し
   external_role_id VARCHAR(255) NOT NULL, -- TODO 名前と型の見直し
   role_id INT UNSIGNED NOT NULL,
-  project_id INT UNSIGNED NULL, -- TODO いるかどうか見直し
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(external_user_provider_code, external_role_id, role_id)
