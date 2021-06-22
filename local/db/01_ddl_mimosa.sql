@@ -22,23 +22,22 @@ CREATE TABLE user_role (
   PRIMARY KEY(user_id, role_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
-CREATE TABLE external_user ( -- TODO 名前の見直し
-  external_user_id VARCHAR(255) NOT NULL, -- TODO 名前と型の見直し
-  external_user_provider_code VARCHAR(255) NOT NULL, -- TODO 名前と型の見直し
+CREATE TABLE ext_user (
+  ext_user_id VARCHAR(255) NOT NULL, -- TODO 型の見直し
+  ext_user_provider_id VARCHAR(255) NOT NULL, -- TODO 型の見直し
   user_id INT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(external_user_id, external_user_provider_code),
+  PRIMARY KEY(ext_user_id, ext_user_provider_id),
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
-CREATE TABLE external_user_role (
-  external_user_id VARCHAR(255) NOT NULL, -- TODO 名前と型の見直し
-  external_user_provider_code VARCHAR(255) NOT NULL, -- TODO 名前と型の見直し
+CREATE TABLE ext_user_role (
+  ext_user_id VARCHAR(255) NOT NULL, -- TODO 型の見直し
+  ext_user_provider_id VARCHAR(255) NOT NULL, -- TODO 型の見直し
   role_id INT UNSIGNED NOT NULL,
-  project_id INT UNSIGNED NULL, -- TODO いらないかも
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(external_user_id, external_user_provider_code, role_id)
+  PRIMARY KEY(ext_user_id, ext_user_provider_id, role_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 CREATE TABLE role (
@@ -463,20 +462,20 @@ CREATE TABLE gcp_data_source (
   PRIMARY KEY(gcp_id, google_data_source_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
--- USER_INTEGRATION TODO 名前考える------------------------------------------------
-CREATE TABLE role_matching ( -- TODO 名前見直し
-  external_user_provider_code VARCHAR(255) NOT NULL, -- TODO 名前と型の見直し
-  external_role_id VARCHAR(255) NOT NULL, -- TODO 名前と型の見直し
+-- EXT_USER_INTEGRATION ------------------------------------------------
+CREATE TABLE ext_role_mapping (
+  ext_user_provider_id VARCHAR(255) NOT NULL, -- TODO 型の見直し
+  ext_role_id VARCHAR(255) NOT NULL, -- TODO 型の見直し
   role_id INT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(external_user_provider_code, external_role_id, role_id)
+  PRIMARY KEY(ext_user_provider_id, ext_role_id, role_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
-CREATE TABLE integrated_user ( -- TODO 名前見直し
-  external_user_provider_code VARCHAR(255) NOT NULL, -- TODO 名前と型の見直し
-  external_user_id VARCHAR(255) NOT NULL, -- TODO 名前と型の見直し
+CREATE TABLE integration_user (
+  ext_user_provider_id VARCHAR(255) NOT NULL, -- TODO 型の見直し
+  ext_user_id VARCHAR(255) NOT NULL, -- TODO 型の見直し
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(external_user_provider_code, external_user_id)
+  PRIMARY KEY(ext_user_provider_id, ext_user_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
