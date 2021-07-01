@@ -34,8 +34,12 @@ func TestGenerateRequestID(t *testing.T) {
 				gotIDs = append(gotIDs, got)
 			}
 			for _, target := range gotIDs {
+				sameCnt := 0
 				for _, id := range gotIDs {
 					if target == id {
+						sameCnt++
+					}
+					if sameCnt > 1 {
 						t.Fatalf("Detect same id pattern on the %d loops, ID=%s", c.loops, target)
 					}
 				}
