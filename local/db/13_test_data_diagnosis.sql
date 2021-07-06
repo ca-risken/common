@@ -11,4 +11,10 @@ INSERT INTO jira_setting(jira_setting_id, name, diagnosis_data_source_id, projec
 INSERT INTO wpscan_setting(wpscan_setting_id, diagnosis_data_source_id,project_id, target_url, status, status_detail, scan_at) VALUES
   (1001, 1002, 1001, 'http://example.com', 'CONFIGURED', '', null);
 
+INSERT INTO portscan_setting(portscan_setting_id, diagnosis_data_source_id, project_id, name, status, status_detail, scan_at) VALUES
+  (1001, 1003, 1001, 'test_target', 'CONFIGURED', '', null);
+
+INSERT INTO portscan_target(portscan_target_id, portscan_setting_id, project_id, target) VALUES
+  (1001, 1001, 1001, '127.0.0.1');
+
 commit;
