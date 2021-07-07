@@ -70,14 +70,26 @@ func getScanner(host, protocol string, fPort, tPort int) (*nmap.Scanner, error) 
 		}
 		return scanner, nil
 	}
-	scanner, err := nmap.NewScanner(
-		nmap.WithTargets(host),
-		nmap.WithPorts(fmt.Sprintf("%v-%v", fPort, tPort)),
-		nmap.WithServiceInfo(),
-		nmap.WithSkipHostDiscovery(),
-		nmap.WithUDPScan(),
-		nmap.WithTimingTemplate(nmap.TimingAggressive),
-	)
+	var scanner *nmap.Scanner
+	var err error
+	if fPort == 0 && tPort == 0 {
+		scanner, err = nmap.NewScanner(
+			nmap.WithTargets(host),
+			nmap.WithServiceInfo(),
+			nmap.WithSkipHostDiscovery(),
+			nmap.WithUDPScan(),
+			nmap.WithTimingTemplate(nmap.TimingAggressive),
+		)
+	} else {
+		scanner, err = nmap.NewScanner(
+			nmap.WithTargets(host),
+			nmap.WithPorts(fmt.Sprintf("%v-%v", fPort, tPort)),
+			nmap.WithServiceInfo(),
+			nmap.WithSkipHostDiscovery(),
+			nmap.WithUDPScan(),
+			nmap.WithTimingTemplate(nmap.TimingAggressive),
+		)
+	}
 	if err != nil {
 		return nil, err
 	}
