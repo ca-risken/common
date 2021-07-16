@@ -1,3 +1,3 @@
-FROM roribio16/alpine-sqs:latest
+FROM softwaremill/elasticmq-native:latest
 
 COPY elasticmq.conf /opt/
