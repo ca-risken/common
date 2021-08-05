@@ -407,6 +407,7 @@ CREATE TABLE code_gitleaks (
   name VARCHAR(64) NULL,
   project_id INT UNSIGNED NOT NULL,
   type ENUM('UNKNOWN_TYPE', 'ENTERPRISE' ,'ORGANIZATION', 'USER') NOT NULL DEFAULT 'UNKNOWN_TYPE',
+  base_url VARCHAR(128) NULL,
   target_resource VARCHAR(128) NOT NULL,
   repository_pattern VARCHAR(128) NULL,
   github_user VARCHAR(64) NULL,
