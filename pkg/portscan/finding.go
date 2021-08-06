@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -67,6 +68,7 @@ func (n *NmapResult) GetScore() float32 {
 	status := n.Status
 	protocol := n.Protocol
 	port := n.Port
+	service := n.Service
 	if strings.ToUpper(status) == "CLOSED" || (strings.ToUpper(protocol) == "TCP" && strings.Index(strings.ToUpper(status), "FILTERED") > -1) {
 		return 1.0
 	}
@@ -79,13 +81,34 @@ func (n *NmapResult) GetScore() float32 {
 	case 3306, 5432, 6379:
 		return 8.0
 	default:
-		score := getScoreByScanDetail(n.ScanDetail)
+		score := getScoreByScanDetail(service, port, n.ScanDetail)
 		return score
 	}
 }
 
 func (n *NmapResult) GetDescription() string {
-	return fmt.Sprintf("%v is %v. protocol: %v, port %v", n.Target, n.Status, n.Protocol, n.Port)
+	detail := n.ScanDetail
+	desc := fmt.Sprintf("target: %v, protocol: %v, port: %v, status: %v, service: %v", n.Target, n.Protocol, n.Port, n.Status, n.Service)
+	statusCode, ok := detail["status"]
+	if ok {
+		desc += fmt.Sprintf(", code: %v", statusCode)
+	}
+	server, ok := detail["server"]
+	if ok {
+		desc += fmt.Sprintf(", server: %v", server)
+	}
+	redirect, ok := detail["redirect"]
+	if ok {
+		if reflect.TypeOf(redirect).String() == "[]string" {
+			desc += fmt.Sprintf(", redirect: %v", strings.Join(redirect.([]string), ","))
+		} else {
+			desc += fmt.Sprintf(", redirect: %v", redirect)
+		}
+	}
+	if len(desc) > 200 {
+		desc = desc[0:197] + "..."
+	}
+	return desc
 }
 
 func (n *NmapResult) GetDataSourceID() string {
@@ -94,13 +117,16 @@ func (n *NmapResult) GetDataSourceID() string {
 	return hex.EncodeToString(hash[:])
 }
 
-func getScoreByScanDetail(detail map[string]interface{}) float32 {
-	val, ok := detail["status"]
+func getScoreByScanDetail(service string, port int, detail map[string]interface{}) float32 {
+	status, ok := detail["status"]
 	if !ok {
 		return 6.0
 	}
-	if strings.Index(val.(string), "401") > -1 || strings.Index(val.(string), "403") > -1 {
-		return 1.0
+	if strings.Index(status.(string), "401") > -1 || strings.Index(status.(string), "403") > -1 {
+		if service == "https" || port == 443 {
+			return 1.0
+		}
+		return 6.0
 	}
 	return 6.0
 
