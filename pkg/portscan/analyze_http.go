@@ -2,6 +2,7 @@ package portscan
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -22,7 +23,6 @@ func analyzeHTTP(target string, port int) (map[string]interface{}, error) {
 	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Printf("%v", err)
 		return nil, err
 	}
 	transport := &http.Transport{
@@ -32,8 +32,19 @@ func analyzeHTTP(target string, port int) (map[string]interface{}, error) {
 		Timeout:   time.Duration(5 * time.Second),
 		Transport: transport,
 	}
+	var redirectURL []string
+	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		u := req.URL
+		u.RawQuery = ""
+		redirectURL = append(redirectURL, u.String())
+		if len(via) >= 10 {
+			return errors.New("stopped after 10 redirects")
+		}
+		return nil
+	}
 	resp, err := client.Do(req)
 	if err != nil {
+		// TODO add Logger
 		fmt.Printf("%v", err)
 		return nil, err
 	}
@@ -41,8 +52,13 @@ func analyzeHTTP(target string, port int) (map[string]interface{}, error) {
 
 	ret := map[string]interface{}{
 		"status":          resp.Status,
-		"header":          resp.Header,
 		"isHTTPOpenProxy": checkHTTPOpenProxy(target, port),
+	}
+	if resp.Header.Get("Server") != "" {
+		ret["server"] = resp.Header.Get("Server")
+	}
+	if len(redirectURL) > 0 {
+		ret["redirect"] = redirectURL
 	}
 	return ret, nil
 }
@@ -62,6 +78,7 @@ func checkHTTPOpenProxy(target string, port int) bool {
 	}
 	result, warn, err := scanner.Run()
 	if err != nil {
+		// TODO add Logger
 		fmt.Printf("Nmap warning: %v", warn)
 		return false
 	}
