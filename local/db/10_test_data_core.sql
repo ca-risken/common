@@ -30,6 +30,13 @@ INSERT INTO policy(policy_id, name, project_id, action_ptn, resource_ptn) VALUES
   (1001, 'admin-policy', 1001, '.*', '.*'),
   (1002, 'viewer-policy', 1001, '^.*/(get-|list-|describe-|show-)', '.*');
 
+INSERT INTO access_token(access_token_id, token_hash, name, description, project_id, last_updated_user_id) VALUES
+  -- plain-text: `token`
+  (1001, '2265daba0872fc3aef169d079365e590f0cbc8ed46c2a7984c8a642803cfd96cb47804a63cf22a79f6ca469268c29ee9e72a5059b62d0a598fe42dfc8dcc51bc', 'token-name', 'test', 1001, 1001);
+
+INSERT INTO access_token_role(access_token_id, role_id) VALUES
+  (1001, 1001);
+
 INSERT INTO finding(finding_id, description, data_source, data_source_id, resource_name, project_id, original_score, score, data) VALUES
   (1001, 'desc-1001', 'aws:guard-duty', 'guard-duty-0001', 'arn:aws:s3:::example-bucket',      1001, 100.00, 1.00, '{"data":{"key":"value"}}'),
   (1002, 'desc-1002', 'aws:guard-duty', 'guard-duty-0002', 'arn:aws:s3:::example-bucket',      1001, 99.05, 0.99,  '{"data":{"key":"value"}}'),
