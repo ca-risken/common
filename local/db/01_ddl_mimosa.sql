@@ -33,7 +33,7 @@ CREATE TABLE access_token (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(access_token_id),
-  UNIQUE KEY uidx_access_token (token_hash)
+  UNIQUE KEY uidx_access_token (project_id, name)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE access_token_role (
