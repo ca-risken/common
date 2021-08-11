@@ -13,14 +13,7 @@ import (
 )
 
 func analyzeHTTP(target string, port int) (map[string]interface{}, error) {
-	var url string
-	if port == 443 {
-		url = fmt.Sprintf("https://%v", target)
-	} else if port == 80 {
-		url = fmt.Sprintf("http://%v", target)
-	} else {
-		url = fmt.Sprintf("http://%v:%v", target, port)
-	}
+	url := makeURL(target, port)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -92,4 +85,15 @@ func checkHTTPOpenProxy(target string, port int) bool {
 		}
 	}
 	return false
+}
+
+func makeURL(target string, port int) string {
+	switch port {
+	case 443:
+		return fmt.Sprintf("https://%v", target)
+	case 80:
+		return fmt.Sprintf("http://%v", target)
+	default:
+		return fmt.Sprintf("http://%v:%v", target, port)
+	}
 }
