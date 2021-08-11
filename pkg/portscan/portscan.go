@@ -13,7 +13,6 @@ type NmapResult struct {
 	Status       string                 `json:"status"`
 	Service      string                 `json:"service"`
 	ResourceName string                 `json:"resource_name"`
-	ExternalLink string                 `json:"external_link"`
 	ScanDetail   map[string]interface{} `json:"scan_detail"`
 }
 
@@ -45,12 +44,11 @@ func runNmap(target, protocol string, fPort, tPort int) ([]*NmapResult, error) {
 	for _, host := range result.Hosts {
 		for _, port := range host.Ports {
 			nmapResults = append(nmapResults, &NmapResult{
-				Port:         int(port.ID),
-				Protocol:     protocol,
-				Target:       target,
-				Status:       port.State.State,
-				Service:      port.Service.Name,
-				ExternalLink: makeURL(target, int(port.ID)),
+				Port:     int(port.ID),
+				Protocol: protocol,
+				Target:   target,
+				Status:   port.State.State,
+				Service:  port.Service.Name,
 			})
 		}
 	}
