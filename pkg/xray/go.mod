@@ -1,4 +1,4 @@
-module github.com/CyberAgent/mimosa-common/pkg/xray
+module github.com/ca-risken/common/pkg/xray
 
 go 1.16
 

@@ -1,1 +1,1 @@
-# mimosa-common
+# common
