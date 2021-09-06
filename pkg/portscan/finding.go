@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/CyberAgent/mimosa-core/proto/finding"
+	"github.com/ca-risken/core/proto/finding"
 )
 
 func (n *NmapResult) GetFindings(projectID uint32, dataSource, data string) []*finding.FindingForUpsert {
