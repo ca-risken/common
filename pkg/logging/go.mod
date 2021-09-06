@@ -1,4 +1,4 @@
-module github.com/CyberAgent/mimosa-common/pkg/logging
+module github.com/ca-risken/common/pkg/logging
 
 go 1.16
 

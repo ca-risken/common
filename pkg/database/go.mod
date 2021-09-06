@@ -1,4 +1,4 @@
-module github.com/CyberAgent/mimosa-common/pkg/database
+module github.com/ca-risken/common/pkg/database
 
 go 1.16
 

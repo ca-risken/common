@@ -1,4 +1,4 @@
-module github.com/CyberAgent/mimosa-common/pkg/portscan
+module github.com/ca-risken/common/pkg/portscan
 
 go 1.15
 

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/CyberAgent/mimosa-common/pkg/portscan"
+	"github.com/ca-risken/common/pkg/portscan"
 )
 
 func main() {
