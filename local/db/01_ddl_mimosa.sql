@@ -417,6 +417,7 @@ CREATE TABLE application_scan (
   diagnosis_data_source_id INT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
   name VARCHAR(200),
+  scan_type ENUM('UNKONWN','BASIC') NOT NULL DEFAULT 'UNKONWN',
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail VARCHAR(255) NULL,
   scan_at DATETIME NULL,
@@ -434,7 +435,8 @@ CREATE TABLE application_scan_basic_setting (
   max_children INT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(application_scan_basic_setting_id)
+  PRIMARY KEY(application_scan_basic_setting_id),
+  UNIQUE KEY uidx_diagnosis_application_scan_basic_setting (application_scan_id, project_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 
