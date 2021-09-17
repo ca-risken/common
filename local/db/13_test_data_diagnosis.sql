@@ -17,8 +17,8 @@ INSERT INTO portscan_setting(portscan_setting_id, diagnosis_data_source_id, proj
 INSERT INTO portscan_target(portscan_target_id, portscan_setting_id, project_id,target, status, status_detail, scan_at) VALUES
   (1001, 1001, 1001, '127.0.0.1', 'CONFIGURED', '', null);
 
-INSERT INTO application_scan(application_scan_id, diagnosis_data_source_id, project_id, name, status, status_detail, scan_at) VALUES
-  (1001, 1004, 1001, 'test_target','CONFIGURED','',null);
+INSERT INTO application_scan(application_scan_id, diagnosis_data_source_id, project_id, name, scan_type, status, status_detail, scan_at) VALUES
+  (1001, 1004, 1001, 'test_target','BASIC', 'CONFIGURED','',null);
 
 INSERT INTO application_scan_basic_setting(application_scan_basic_setting_id, application_scan_id, project_id,target,max_depth,max_children) VALUES
   (1001, 1001, 1001, 'http://exanmple.com', 10, 10);
