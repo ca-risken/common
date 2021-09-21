@@ -417,7 +417,7 @@ CREATE TABLE application_scan (
   diagnosis_data_source_id INT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
   name VARCHAR(200),
-  scan_type ENUM('UNKONWN','BASIC') NOT NULL DEFAULT 'UNKONWN',
+  scan_type ENUM('NOT_CONFIGURED', 'BASIC') NOT NULL DEFAULT 'BASIC',
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail VARCHAR(255) NULL,
   scan_at DATETIME NULL,

@@ -21,6 +21,6 @@ INSERT INTO application_scan(application_scan_id, diagnosis_data_source_id, proj
   (1001, 1004, 1001, 'test_target','BASIC', 'CONFIGURED','',null);
 
 INSERT INTO application_scan_basic_setting(application_scan_basic_setting_id, application_scan_id, project_id,target,max_depth,max_children) VALUES
-  (1001, 1001, 1001, 'http://exanmple.com', 10, 10);
+  (1001, 1001, 1001, 'http://localhost', 10, 10);
 
 commit;
