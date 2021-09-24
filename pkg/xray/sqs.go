@@ -9,20 +9,15 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-xray-sdk-go/header"
 	"github.com/aws/aws-xray-sdk-go/xray"
-	"github.com/gassara-kys/go-sqs-poller/worker/v4"
+	mimosasqs "github.com/ca-risken/common/pkg/sqs"
 )
 
 type QueueMessage struct {
 	ScanOnly bool `json:"scan_only,string"`
 }
 
-type MessageHandler interface {
-	HandleMessage(ctx context.Context, message *sqs.Message) error
-}
-
-func MessageTracingHandler(env, segmentName string, next MessageHandler) worker.Handler {
-	return worker.HandlerFunc(func(msg *sqs.Message) error {
-		ctx := context.Background()
+func MessageTracingHandler(env, segmentName string, next mimosasqs.Handler) mimosasqs.Handler {
+	return mimosasqs.HandlerFunc(func(ctx context.Context, msg *sqs.Message) error {
 		ctx, segment := xray.BeginSegment(ctx, segmentName)
 
 		inheritTrace := true
