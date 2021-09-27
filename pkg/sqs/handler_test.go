@@ -24,7 +24,7 @@ func TestRetryableErrorHandler(t *testing.T) {
 
 	nonRetryableErrorCase := HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
 		err := fmt.Errorf("some non retryable error")
-		return NonRetryableError{err}
+		return WrapNonRetryable(err)
 	})
 	actual = RetryableErrorHandler(nonRetryableErrorCase).HandleMessage(context.Background(), nil)
 	assert.Nil(t, actual)

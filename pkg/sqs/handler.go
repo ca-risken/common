@@ -26,6 +26,10 @@ type NonRetryableError struct {
 	error
 }
 
+func WrapNonRetryable(err error) NonRetryableError {
+	return NonRetryableError{err}
+}
+
 func (e NonRetryableError) Error() string {
 	return fmt.Sprintf("NonRetryableError caused: %s", e.error.Error())
 }
