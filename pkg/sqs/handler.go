@@ -2,6 +2,8 @@ package sqs
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	awssqs "github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/gassara-kys/go-sqs-poller/worker/v4"
@@ -17,6 +19,15 @@ type HandlerFunc func(ctx context.Context, msg *awssqs.Message) error
 
 func (f HandlerFunc) HandleMessage(ctx context.Context, msg *awssqs.Message) error {
 	return f(ctx, msg)
+}
+
+// NonRetryableError indicates an error that the message cause the error cannot be retried.
+type NonRetryableError struct {
+	error
+}
+
+func (e NonRetryableError) Error() string {
+	return fmt.Sprintf("NonRetryableError caused: %s", e.error.Error())
 }
 
 // InitializeHandler returns go-sqs-poller worker Handler from common Handler interface.
@@ -36,5 +47,17 @@ func StatusLoggingHandler(logger *logrus.Logger, h Handler) Handler {
 			logger.Infof("handling message succeeded.")
 		}
 		return err
+	})
+}
+
+// RetryableErrorHandler returns the Handler that returns nil when NonRetryableError occurred.
+func RetryableErrorHandler(h Handler) Handler {
+	return HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
+		err := h.HandleMessage(ctx, msg)
+		var target NonRetryableError
+		if err != nil && !errors.As(err, &target) {
+			return err
+		}
+		return nil
 	})
 }
