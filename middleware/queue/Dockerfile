@@ -1,3 +1,3 @@
-FROM softwaremill/elasticmq-native:latest
+FROM softwaremill/elasticmq:latest
 
 COPY elasticmq.conf /opt/
