@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_PREFIX: "risken-core"
+    IMAGE_PREFIX: "middleware"
   parameter-store:
     GITHUB_USER: "/build/GITHUB_USER"
     GITHUB_TOKEN: "/build/GITHUB_TOKEN"
@@ -37,4 +37,3 @@ phases:
       - echo Pushing the Docker manifest...
       - make push-manifest -j IMAGE_REGISTRY=${REGISTRY} IMAGE_PREFIX=${IMAGE_PREFIX} MANIFEST_TAG=${MANIFEST_TAG}
       - make push-manifest -j IMAGE_REGISTRY=${REGISTRY} IMAGE_PREFIX=${IMAGE_PREFIX} MANIFEST_TAG=latest
-

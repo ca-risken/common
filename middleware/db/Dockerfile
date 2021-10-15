@@ -1,4 +1,5 @@
-FROM mysql:5.7.32
+# MySQL5.7 is not supported for `arm64` arch.
+FROM mysql:latest
 
 ENV MYSQL_USER=root
 ENV MYSQL_PASSWORD=
