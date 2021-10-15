@@ -21,7 +21,7 @@ phases:
       - PKG=${CODEBUILD_SRC_DIR}/pkg
       - MIDDLEWARE=${CODEBUILD_SRC_DIR}/middleware
       - BUILD_OPT="--no-cache --pull"
-      - TAG=$(git rev-parse --short HEAD)_${OS}_${ARCH}
+      - TAG=v0.0.${CODEBUILD_BUILD_NUMBER}
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
       - REGISTRY=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
       - AWS_XRAY_SDK_DISABLED=TRUE
@@ -47,3 +47,4 @@ phases:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - cd ${MIDDLEWARE} && make push-image -j IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG=${TAG} IMAGE_REGISTRY=${REGISTRY}
+      - cd ${MIDDLEWARE} && make push-image -j IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG=latest IMAGE_REGISTRY=${REGISTRY}
