@@ -24,6 +24,7 @@ build-ci: $(BUILD_CI_TARGETS)
 %.build-ci:
 	TARGET=$(*) IMAGE_TAG=$(IMAGE_TAG) IMAGE_PREFIX=$(IMAGE_PREFIX) BUILD_OPT="$(BUILD_OPT)" . hack/docker-build.sh
 	docker tag $(IMAGE_PREFIX)/$(*):$(IMAGE_TAG) $(IMAGE_REGISTRY)/$(IMAGE_PREFIX)/$(*):$(IMAGE_TAG)
+	docker tag $(IMAGE_PREFIX)/$(*):$(IMAGE_TAG) $(IMAGE_REGISTRY)/$(IMAGE_PREFIX)/$(*):latest
 
 PHONY: push-image $(IMAGE_PUSH_TARGETS)
 push-image: $(IMAGE_PUSH_TARGETS)

@@ -23,7 +23,6 @@ phases:
       - MIDDLEWARE=${CODEBUILD_SRC_DIR}/middleware
       - BUILD_OPT="--no-cache --pull"
       - TAG=${CODEBUILD_WEBHOOK_TRIGGER#tag/}
-      - IMAGE_TAG=${TAG}_${OS}_${ARCH}
       - AWS_XRAY_SDK_DISABLED=TRUE
 
       - echo Logging in to Amazon ECR...
@@ -40,10 +39,11 @@ phases:
     commands:
       - echo Build gateway started on `date`
       - echo Pushing the Docker images...
-      - cd ${MIDDLEWARE} && make build-ci -j BUILD_OPT="${BUILD_OPT}" IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG=${IMAGE_TAG} IMAGE_REGISTRY=${REGISTRY}
+      - cd ${MIDDLEWARE} && make build-ci -j BUILD_OPT="${BUILD_OPT}" IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG=${TAG} IMAGE_REGISTRY=${REGISTRY}
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - cd ${MIDDLEWARE} && make push-image -j IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG=${IMAGE_TAG} IMAGE_REGISTRY=${REGISTRY}
+      - cd ${MIDDLEWARE} && make push-image -j IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG=${TAG} IMAGE_REGISTRY=${REGISTRY}
+      - cd ${MIDDLEWARE} && make push-image -j IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG=latest IMAGE_REGISTRY=${REGISTRY}
