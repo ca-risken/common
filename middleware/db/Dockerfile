@@ -1,4 +1,4 @@
-FROM mysql:5.7
+FROM mysql:5.7.32
 
 ENV MYSQL_USER=root
 ENV MYSQL_PASSWORD=
