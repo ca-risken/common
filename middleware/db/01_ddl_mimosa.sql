@@ -381,6 +381,7 @@ CREATE TABLE wpscan_setting (
   diagnosis_data_source_id INT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
   target_url VARCHAR(200),
+  options JSON NULL,
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail VARCHAR(255) NULL,
   scan_at DATETIME NULL,
