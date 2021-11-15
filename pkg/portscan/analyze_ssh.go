@@ -37,7 +37,7 @@ func checkSSHPasswordAuth(target string, port int) bool {
 	for _, host := range result.Hosts {
 		for _, port := range host.Ports {
 			for _, script := range port.Scripts {
-				if strings.Index(script.Output, "password") > -1 {
+				if strings.Contains(script.Output, "password") {
 					return true
 				}
 			}
