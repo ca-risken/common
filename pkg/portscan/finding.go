@@ -69,7 +69,7 @@ func (n *NmapResult) GetScore() float32 {
 	protocol := n.Protocol
 	port := n.Port
 	service := n.Service
-	if strings.ToUpper(status) == "CLOSED" || (strings.ToUpper(protocol) == "TCP" && strings.Index(strings.ToUpper(status), "FILTERED") > -1) {
+	if strings.ToUpper(status) == "CLOSED" || (strings.ToUpper(protocol) == "TCP" && strings.Contains(strings.ToUpper(status), "FILTERED")) {
 		return 1.0
 	}
 	if strings.ToUpper(protocol) == "UDP" {
@@ -122,7 +122,7 @@ func getScoreByScanDetail(service string, port int, detail map[string]interface{
 	if !ok {
 		return 6.0
 	}
-	if strings.Index(status.(string), "401") > -1 || strings.Index(status.(string), "403") > -1 {
+	if strings.Contains(status.(string), "401") || strings.Contains(status.(string), "403") {
 		if service == "https" || port == 443 {
 			return 1.0
 		}
