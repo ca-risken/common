@@ -21,14 +21,18 @@ func (n *NmapResult) analyzeResult() error {
 		n.ScanDetail = data
 		return nil
 	}
-
-	switch n.Port {
-	default:
-		data, err := analyzeHTTP(n.Target, n.Port)
-		if err != nil {
-			return nil
+	switch n.Protocol {
+	case "tcp":
+		switch n.Port {
+		default:
+			data, err := analyzeHTTP(n.Target, n.Port)
+			if err != nil {
+				return nil
+			}
+			n.ScanDetail = data
 		}
-		n.ScanDetail = data
+	case "udp":
+		return nil
 	}
 	return nil
 }
