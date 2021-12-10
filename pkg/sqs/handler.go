@@ -47,7 +47,7 @@ func StatusLoggingHandler(logger *logrus.Logger, h Handler) Handler {
 	return HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
 		now := time.Now()
 		err := h.HandleMessage(ctx, msg)
-		elapsed := time.Now().Sub(now).Seconds()
+		elapsed := time.Since(now).Seconds()
 		slogger := logger.WithField("elapsed", elapsed)
 		if err != nil {
 			slogger.Warnf("handling message failed. err: %+v", err)
