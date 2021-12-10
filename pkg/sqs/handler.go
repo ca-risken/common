@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	awssqs "github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/gassara-kys/go-sqs-poller/worker/v4"
@@ -44,11 +45,14 @@ func InitializeHandler(h Handler) worker.Handler {
 
 func StatusLoggingHandler(logger *logrus.Logger, h Handler) Handler {
 	return HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
+		now := time.Now()
 		err := h.HandleMessage(ctx, msg)
+		elapsed := time.Now().Sub(now).Seconds()
+		slogger := logger.WithField("elapsed", elapsed)
 		if err != nil {
-			logger.Warnf("handling message failed. err: %+v", err)
+			slogger.Warnf("handling message failed. err: %+v", err)
 		} else {
-			logger.Infof("handling message succeeded.")
+			slogger.Infof("handling message succeeded.")
 		}
 		return err
 	})
