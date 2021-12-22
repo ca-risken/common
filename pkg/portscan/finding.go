@@ -31,7 +31,7 @@ func (n *NmapResult) GetFindings(projectID uint32, dataSource, data string) []*f
 		if detail == true {
 			addResult := httpCheckResult[key]
 			ret = append(ret, &finding.FindingForUpsert{
-				Description:      addResult.getDescription(n.Target, n.Port),
+				Description:      addResult.GetDescription(n.Target, n.Port),
 				DataSource:       dataSource,
 				DataSourceId:     n.GetDataSourceID(),
 				ResourceName:     n.ResourceName,
@@ -133,25 +133,59 @@ func getScoreByScanDetail(service string, port int, detail map[string]interface{
 }
 
 // TODO 現状使用されていないTagの使用方法/要否の検討
-type additionalCheckResult struct {
-	Score       float32
-	Tag         []string
-	Description string
+type AdditionalCheckResult struct {
+	Score          float32
+	Tag            []string
+	Description    string
+	Risk           string
+	Recommendation string
 }
 
-func (a additionalCheckResult) getDescription(target string, port int) string {
+func (a AdditionalCheckResult) GetDescription(target string, port int) string {
 	ret := a.Description
 	ret = strings.Replace(ret, "{TARGET}", target, 1)
 	ret = strings.Replace(ret, "{PORT}", strconv.Itoa(port), 1)
 	return ret
 }
 
-func (a additionalCheckResult) GetScore() float32 {
+func (a AdditionalCheckResult) GetScore() float32 {
 	return a.Score
 }
 
-var httpCheckResult = map[string]additionalCheckResult{
-	"isHTTPOpenProxy":          additionalCheckResult{Score: 0.8, Tag: []string{"http"}, Description: "{TARGET} is Potentially OPEN proxy. port: {PORT}"},
-	"isSSHEnabledPasswordAuth": additionalCheckResult{Score: 0.8, Tag: []string{"ssh"}, Description: "{TARGET} is supported password authentication. port: {PORT}"},
-	"isSMTPOpenRelay":          additionalCheckResult{Score: 0.8, Tag: []string{"smtp"}, Description: "{TARGET} is an open relay. port: {PORT}"},
+func (a AdditionalCheckResult) GetRisk() string {
+	return a.Risk
+}
+
+func (a AdditionalCheckResult) GetRecommendation() string {
+	return a.Recommendation
+}
+
+func GetAdditionalCheckResult(key string) (AdditionalCheckResult, bool) {
+	if _, ok := httpCheckResult[key]; !ok {
+		return AdditionalCheckResult{}, false
+	}
+	return httpCheckResult[key], true
+}
+
+var httpCheckResult = map[string]AdditionalCheckResult{
+	"isHTTPOpenProxy": AdditionalCheckResult{Score: 0.8, Tag: []string{"http"},
+		Description: "{TARGET} is Potentially OPEN proxy. port: {PORT}",
+		Risk: `HTTP Open Proxies is Enabled.
+	- Malicious client can use an open proxy to launch an attack that originates from the proxy server's IP.`,
+		Recommendation: `Stop the open proxy.
+	- Restrict target TCP and UDP port to trusted IP addresses.
+	- Allow specific users to use the proxy by authenticating them.`},
+	"isSSHEnabledPasswordAuth": AdditionalCheckResult{Score: 0.8, Tag: []string{"ssh"},
+		Description: "{TARGET} is supported password authentication. port: {PORT}",
+		Risk: `HTTP Open Proxies is Enabled.
+	- Malicious client can use an open proxy to launch an attack that originates from the proxy server's IP.`,
+		Recommendation: `Stop the open proxy.
+	- Restrict target TCP and UDP port to trusted IP addresses. `},
+	"isSMTPOpenRelay": AdditionalCheckResult{Score: 0.8, Tag: []string{"smtp"},
+		Description: "{TARGET} is an open relay. port: {PORT}",
+		Risk: `SMTP Open Relay is Enabled.
+	- Spammers can exploit open SMTP relays to send large amounts of email.
+	- If the SMTP server is abused by spammers, the source of the SMTP server may be blacklisted.`,
+		Recommendation: `Stop the open proxy.
+	- Restrict target TCP and UDP port to trusted IP addresses. `},
 }

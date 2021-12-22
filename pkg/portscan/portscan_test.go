@@ -317,3 +317,149 @@ func TestGetScoreByScanDetail(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAdditionalCheck(t *testing.T) {
+	cases := []struct {
+		name          string
+		key           string
+		expect        AdditionalCheckResult
+		expectIsFound bool
+	}{
+		{
+			name: "AdditionalCheckResult is found.",
+			key:  "isHTTPOpenProxy",
+			expect: AdditionalCheckResult{Score: 0.8, Tag: []string{"http"},
+				Description: "{TARGET} is Potentially OPEN proxy. port: {PORT}",
+				Risk: `HTTP Open Proxies is Enabled.
+	- Malicious client can use an open proxy to launch an attack that originates from the proxy server's IP.`,
+				Recommendation: `Stop the open proxy.
+	- Restrict target TCP and UDP port to trusted IP addresses.
+	- Allow specific users to use the proxy by authenticating them.`},
+			expectIsFound: true,
+		},
+		{
+			name:          "AdditionalCheckResult is not found.",
+			key:           "hogefugapiyo",
+			expect:        AdditionalCheckResult{},
+			expectIsFound: false,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			acr, isFound := GetAdditionalCheckResult(c.key)
+			if c.expectIsFound != isFound {
+				t.Fatalf("Unexpected isFound: want=%v, got=%v", c.expectIsFound, isFound)
+			}
+			if !reflect.DeepEqual(c.expect, acr) {
+				t.Fatalf("Unexpected AdditionalCheckResult: want=%v, got=%v", c.expect, acr)
+			}
+		})
+	}
+}
+
+func TestGetAdditionalDescription(t *testing.T) {
+	cases := []struct {
+		name   string
+		adr    AdditionalCheckResult
+		target string
+		port   int
+		expect string
+	}{
+		{
+			name:   "Get Description",
+			adr:    AdditionalCheckResult{Score: 0.8, Tag: []string{"http"}, Description: "{TARGET} is Potentially OPEN proxy. port: {PORT}"},
+			target: "hoge",
+			port:   80,
+			expect: "hoge is Potentially OPEN proxy. port: 80",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			desc := c.adr.GetDescription(c.target, c.port)
+			if c.expect != desc {
+				t.Fatalf("Unexpected description: want=%v, got=%v", c.expect, desc)
+			}
+		})
+	}
+}
+
+func TestGetAdditionalScore(t *testing.T) {
+	cases := []struct {
+		name   string
+		adr    AdditionalCheckResult
+		expect float32
+	}{
+		{
+			name:   "Get Description",
+			adr:    AdditionalCheckResult{Score: 0.8, Tag: []string{"http"}, Description: "{TARGET} is Potentially OPEN proxy. port: {PORT}"},
+			expect: 0.8,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			score := c.adr.GetScore()
+			if c.expect != score {
+				t.Fatalf("Unexpected score: want=%v, got=%v", c.expect, score)
+			}
+		})
+	}
+}
+
+func TestGetAdditionaRisk(t *testing.T) {
+	cases := []struct {
+		name   string
+		adr    AdditionalCheckResult
+		expect string
+	}{
+		{
+			name: "Get Risk",
+			adr: AdditionalCheckResult{Score: 0.8, Tag: []string{"http"},
+				Description: "{TARGET} is Potentially OPEN proxy. port: {PORT}",
+				Risk: `HTTP Open Proxies is Enabled.
+	- Malicious client can use an open proxy to launch an attack that originates from the proxy server's IP.`,
+				Recommendation: `Stop the open proxy.
+	- Restrict target TCP and UDP port to trusted IP addresses.
+	- Allow specific users to use the proxy by authenticating them.`},
+			expect: `HTTP Open Proxies is Enabled.
+	- Malicious client can use an open proxy to launch an attack that originates from the proxy server's IP.`,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			risk := c.adr.GetRisk()
+			if c.expect != risk {
+				t.Fatalf("Unexpected risk: want=%v, got=%v", c.expect, risk)
+			}
+		})
+	}
+}
+
+func TestGetAdditionaRecommendation(t *testing.T) {
+	cases := []struct {
+		name   string
+		adr    AdditionalCheckResult
+		expect string
+	}{
+		{
+			name: "Get Recommendation",
+			adr: AdditionalCheckResult{Score: 0.8, Tag: []string{"http"},
+				Description: "{TARGET} is Potentially OPEN proxy. port: {PORT}",
+				Risk: `HTTP Open Proxies is Enabled.
+	- Malicious client can use an open proxy to launch an attack that originates from the proxy server's IP.`,
+				Recommendation: `Stop the open proxy.
+	- Restrict target TCP and UDP port to trusted IP addresses.
+	- Allow specific users to use the proxy by authenticating them.`},
+			expect: `Stop the open proxy.
+	- Restrict target TCP and UDP port to trusted IP addresses.
+	- Allow specific users to use the proxy by authenticating them.`,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			risk := c.adr.GetRecommendation()
+			if c.expect != risk {
+				t.Fatalf("Unexpected recommendation: want=%v, got=%v", c.expect, risk)
+			}
+		})
+	}
+}
