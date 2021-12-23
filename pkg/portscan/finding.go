@@ -136,10 +136,17 @@ func getScoreByScanDetail(service string, port int, detail map[string]interface{
 type AdditionalCheckResult struct {
 	Score          float32
 	Tag            []string
+	Type           string
 	Description    string
 	Risk           string
 	Recommendation string
 }
+
+const (
+	recommendTypeHTTPOpenProxy   = "HTTP/OpenProxy"
+	recommendTypeSSHPasswordAuth = "SSH/PasswordAuth"
+	recommendTypeSMTPOpenRelay   = "SMTP/OpenRelay"
+)
 
 func (a AdditionalCheckResult) GetDescription(target string, port int) string {
 	ret := a.Description
@@ -150,6 +157,23 @@ func (a AdditionalCheckResult) GetDescription(target string, port int) string {
 
 func (a AdditionalCheckResult) GetScore() float32 {
 	return a.Score
+}
+
+func (a AdditionalCheckResult) GetType() string {
+	return a.Type
+}
+
+func (a AdditionalCheckResult) GetRecommendType() string {
+	switch a.GetType() {
+	case "isHTTPOpenProxy":
+		return recommendTypeHTTPOpenProxy
+	case "isSSHEnabledPasswordAuth":
+		return recommendTypeSSHPasswordAuth
+	case "isSMTPOpenRelay":
+		return recommendTypeSMTPOpenRelay
+	default:
+		return ""
+	}
 }
 
 func (a AdditionalCheckResult) GetRisk() string {
@@ -168,24 +192,26 @@ func GetAdditionalCheckResult(key string) (AdditionalCheckResult, bool) {
 }
 
 var httpCheckResult = map[string]AdditionalCheckResult{
-	"isHTTPOpenProxy": AdditionalCheckResult{Score: 0.8, Tag: []string{"http"},
+	"isHTTPOpenProxy": AdditionalCheckResult{Score: 0.8, Tag: []string{"http"}, Type: "isHTTPOpenProxy",
 		Description: "{TARGET} is Potentially OPEN proxy. port: {PORT}",
 		Risk: `HTTP Open Proxies is Enabled.
 	- Malicious client can use an open proxy to launch an attack that originates from the proxy server's IP.`,
-		Recommendation: `Stop the open proxy.
+		Recommendation: `Disable open proxy.
 	- Restrict target TCP and UDP port to trusted IP addresses.
 	- Allow specific users to use the proxy by authenticating them.`},
-	"isSSHEnabledPasswordAuth": AdditionalCheckResult{Score: 0.8, Tag: []string{"ssh"},
+	"isSSHEnabledPasswordAuth": AdditionalCheckResult{Score: 0.8, Tag: []string{"ssh"}, Type: "isSSHEnabledPasswordAuth",
 		Description: "{TARGET} is supported password authentication. port: {PORT}",
-		Risk: `HTTP Open Proxies is Enabled.
-	- Malicious client can use an open proxy to launch an attack that originates from the proxy server's IP.`,
+		Risk: `SSH Password Authentication is Enabled.
+	- If weak passwords are used, ssh servers are vulnerable to brute force attacks.`,
 		Recommendation: `Stop the open proxy.
-	- Restrict target TCP and UDP port to trusted IP addresses. `},
-	"isSMTPOpenRelay": AdditionalCheckResult{Score: 0.8, Tag: []string{"smtp"},
+	- Restrict target port to trusted IP addresses.
+	- disable password authentication.`},
+	"isSMTPOpenRelay": AdditionalCheckResult{Score: 0.8, Tag: []string{"smtp"}, Type: "isSMTPOpenRelay",
 		Description: "{TARGET} is an open relay. port: {PORT}",
 		Risk: `SMTP Open Relay is Enabled.
 	- Spammers can exploit open SMTP relays to send large amounts of email.
 	- If the SMTP server is abused by spammers, the source of the SMTP server may be blacklisted.`,
 		Recommendation: `Stop the open proxy.
-	- Restrict target TCP and UDP port to trusted IP addresses. `},
+	- Restrict target TCP and UDP port to trusted IP addresses. 
+	- Disable open relays on smtp servers.`},
 }
