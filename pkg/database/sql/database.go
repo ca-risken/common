@@ -1,6 +1,9 @@
 package sql
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -8,7 +11,7 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-func Open(dsn string, logMode bool) (*gorm.DB, error) {
+func Open(dsn string, logMode bool, maxConn int) (*gorm.DB, error) {
 	instrumentedDB, err := xray.SQLContext("mysql", dsn)
 	if err != nil {
 		return nil, err
@@ -37,5 +40,11 @@ func Open(dsn string, logMode bool) (*gorm.DB, error) {
 	if logMode {
 		db.Logger.LogMode(logger.Info)
 	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get generic database object(sql.DB), err: %+v", err)
+	}
+	sqlDB.SetMaxOpenConns(maxConn)
+	sqlDB.SetConnMaxLifetime(time.Duration(maxConn/2) * time.Second)
 	return db, nil
 }
