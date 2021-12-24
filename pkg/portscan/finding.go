@@ -16,7 +16,7 @@ func (n *NmapResult) GetFindings(projectID uint32, dataSource, data string) []*f
 	findingNmap := &finding.FindingForUpsert{
 		Description:      n.GetDescription(),
 		DataSource:       dataSource,
-		DataSourceId:     n.GetDataSourceID(),
+		DataSourceId:     n.GetDataSourceID(""),
 		ResourceName:     n.ResourceName,
 		ProjectId:        projectID,
 		OriginalScore:    n.GetScore(),
@@ -33,7 +33,7 @@ func (n *NmapResult) GetFindings(projectID uint32, dataSource, data string) []*f
 			ret = append(ret, &finding.FindingForUpsert{
 				Description:      addResult.GetDescription(n.Target, n.Port),
 				DataSource:       dataSource,
-				DataSourceId:     n.GetDataSourceID(),
+				DataSourceId:     n.GetDataSourceID(""),
 				ResourceName:     n.ResourceName,
 				ProjectId:        projectID,
 				OriginalScore:    addResult.GetScore(),
@@ -111,8 +111,11 @@ func (n *NmapResult) GetDescription() string {
 	return desc
 }
 
-func (n *NmapResult) GetDataSourceID() string {
+func (n *NmapResult) GetDataSourceID(additionalCheckType string) string {
 	input := fmt.Sprintf("%v:%v:%v", n.Target, n.Protocol, n.Port)
+	if additionalCheckType != "" {
+		input = fmt.Sprintf("%v:%v:%v:%v", n.Target, n.Protocol, n.Port, additionalCheckType)
+	}
 	hash := sha256.Sum256([]byte(input))
 	return hex.EncodeToString(hash[:])
 }

@@ -1,6 +1,8 @@
 package portscan
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"reflect"
 	"testing"
@@ -251,6 +253,50 @@ func TestGetScore(t *testing.T) {
 			score := c.nmapResult.GetScore()
 			if c.expectScore != score {
 				t.Fatalf("Unexpected score: want=%v, got=%v", c.expectScore, score)
+			}
+		})
+	}
+}
+
+func TestGetDataSourceID(t *testing.T) {
+	cases := []struct {
+		name                string
+		nmapResult          *NmapResult
+		additionalCheckType string
+		expect              string
+	}{
+		{
+			name: "AdditionalCheckType Blank",
+			nmapResult: &NmapResult{
+				ResourceName: "hogeResource",
+				Target:       "example.com",
+				Protocol:     "tcp",
+				Status:       "closed",
+				Port:         8080,
+			},
+			additionalCheckType: "",
+			expect:              fmt.Sprintf("%v:%v:%v", "example.com", "tcp", 8080),
+		},
+		{
+			name: "AdditionalCheckType Exists",
+			nmapResult: &NmapResult{
+				ResourceName: "hogeResource",
+				Target:       "example.com",
+				Protocol:     "udp",
+				Status:       "open",
+				Port:         8080,
+			},
+			additionalCheckType: "isHTTPOpenProxy",
+			expect:              fmt.Sprintf("%v:%v:%v:%v", "example.com", "udp", 8080, "isHTTPOpenProxy"),
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			dataSourceId := c.nmapResult.GetDataSourceID(c.additionalCheckType)
+			hash := sha256.Sum256([]byte(c.expect))
+			expectHex := hex.EncodeToString(hash[:])
+			if expectHex != dataSourceId {
+				t.Fatalf("Unexpected dataSourceId: want=%v, got=%v", expectHex, dataSourceId)
 			}
 		})
 	}
