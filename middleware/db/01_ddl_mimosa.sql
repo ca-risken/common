@@ -144,7 +144,7 @@ CREATE TABLE resource_tag (
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(resource_tag_id),
   UNIQUE KEY uidx_resource_tag (resource_id, tag),
-  INDEX idx_resource_tag(tag)
+  INDEX idx_resource_tag(project_id, tag)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE pend_finding (
