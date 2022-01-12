@@ -107,3 +107,79 @@ func TestMustNotifyf(t *testing.T) {
 		})
 	}
 }
+
+func TestWithItems(t *testing.T) {
+	cases := []struct {
+		name  string
+		input map[string]interface{}
+		want  []string
+	}{
+		{
+			name: "OK single item",
+			input: map[string]interface{}{
+				"key1": "value1",
+			},
+			want: []string{"key1", "value1"},
+		},
+		{
+			name: "OK multiple items",
+			input: map[string]interface{}{
+				"key1": "value1",
+				"key2": "value2",
+			},
+			want: []string{"key1", "value1", "key2", "value2"},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			logger := NewLogger()
+			logger.SetOutput(buf)
+			logger.WithItems(InfoLevel, c.input, "test")
+			logged := buf.String()
+			for _, key := range c.want {
+				if !strings.Contains(logged, key) {
+					t.Fatalf("Unexpected log: want(inclued keyword)=%s, got=%s", key, logged)
+				}
+			}
+		})
+	}
+}
+
+func TestWithItemsf(t *testing.T) {
+	cases := []struct {
+		name  string
+		input map[string]interface{}
+		want  []string
+	}{
+		{
+			name: "OK single item",
+			input: map[string]interface{}{
+				"key1": "value1",
+			},
+			want: []string{"key1", "value1"},
+		},
+		{
+			name: "OK multiple items",
+			input: map[string]interface{}{
+				"key1": "value1",
+				"key2": "value2",
+			},
+			want: []string{"key1", "value1", "key2", "value2"},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			logger := NewLogger()
+			logger.SetOutput(buf)
+			logger.WithItemsf(InfoLevel, c.input, "%s", "test")
+			logged := buf.String()
+			for _, key := range c.want {
+				if !strings.Contains(logged, key) {
+					t.Fatalf("Unexpected log: want(inclued keyword)=%s, got=%s", key, logged)
+				}
+			}
+		})
+	}
+}

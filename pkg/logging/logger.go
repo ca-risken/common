@@ -57,6 +57,8 @@ type Logger interface {
 	GenerateRequestID(prefix string) (string, error)
 	MustNotify(level Level, args ...interface{})
 	MustNotifyf(level Level, format string, args ...interface{})
+	WithItems(level Level, fields map[string]interface{}, args ...interface{})
+	WithItemsf(level Level, fields map[string]interface{}, format string, args ...interface{})
 }
 
 type AppLogger struct {
@@ -165,4 +167,20 @@ func (a *AppLogger) MustNotifyf(level Level, format string, args ...interface{})
 	a.WithFields(logrus.Fields{
 		"notify": true,
 	}).Logf(a.parseLogrusLevel(level), format, args...)
+}
+
+func (a *AppLogger) WithItems(level Level, fields map[string]interface{}, args ...interface{}) {
+	f := logrus.Fields{}
+	for k, v := range fields {
+		f[k] = v
+	}
+	a.WithFields(f).Log(a.parseLogrusLevel(level), args...)
+}
+
+func (a *AppLogger) WithItemsf(level Level, fields map[string]interface{}, format string, args ...interface{}) {
+	f := logrus.Fields{}
+	for k, v := range fields {
+		f[k] = v
+	}
+	a.WithFields(f).Logf(a.parseLogrusLevel(level), format, args...)
 }
