@@ -7,8 +7,8 @@ import (
 	"time"
 
 	awssqs "github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/ca-risken/common/pkg/logging"
 	"github.com/gassara-kys/go-sqs-poller/worker/v4"
-	"github.com/sirupsen/logrus"
 )
 
 // Handler is common interface for handling sqs message in the risken.
@@ -43,16 +43,18 @@ func InitializeHandler(h Handler) worker.Handler {
 	})
 }
 
-func StatusLoggingHandler(logger *logrus.Logger, h Handler) Handler {
+func StatusLoggingHandler(logger logging.Logger, h Handler) Handler {
 	return HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
 		now := time.Now()
 		err := h.HandleMessage(ctx, msg)
 		elapsed := time.Since(now).Seconds()
-		slogger := logger.WithField("elapsed", elapsed)
+		items := map[string]interface{}{
+			"elapsed": elapsed,
+		}
 		if err != nil {
-			slogger.Warnf("handling message failed. err: %+v", err)
+			logger.WithItemsf(logging.WarnLevel, items, "handling message failed. err: %+v", err)
 		} else {
-			slogger.Infof("handling message succeeded.")
+			logger.WithItems(logging.InfoLevel, items, "handling message succeeded.")
 		}
 		return err
 	})
