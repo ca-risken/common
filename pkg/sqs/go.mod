@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/aws/aws-sdk-go v1.40.44
+	github.com/ca-risken/common/pkg/logging v0.0.0-20220112083229-da961170dec3
 	github.com/gassara-kys/go-sqs-poller/worker/v4 v4.0.0-20210215110542-0be358599a2f
-	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 )

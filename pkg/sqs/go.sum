@@ -1,11 +1,15 @@
 github.com/aws/aws-sdk-go v1.37.10/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
 github.com/aws/aws-sdk-go v1.40.44 h1:kECaYybTWYZY5IKHvQMxbE6Wi5Qrb+7hbkV7zQV3Sg8=
 github.com/aws/aws-sdk-go v1.40.44/go.mod h1:585smgzpB/KqRA+K3y/NL/oYRqQvpNJYvLm+LY1U59Q=
+github.com/ca-risken/common/pkg/logging v0.0.0-20220112083229-da961170dec3 h1:RFahm7AkSyZPEUK/SaMhI3EYiC5a3a9dYXfl6nZRF78=
+github.com/ca-risken/common/pkg/logging v0.0.0-20220112083229-da961170dec3/go.mod h1:dmZZ5/wkGbsmAMbhuC7YK6uJOMAlS4OndoM0DQyPhi8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gassara-kys/go-sqs-poller/worker/v4 v4.0.0-20210215110542-0be358599a2f h1:aFdKHpaB7J3wjcEzXB940i5f6jFUV7dhZIBwujT18g8=
 github.com/gassara-kys/go-sqs-poller/worker/v4 v4.0.0-20210215110542-0be358599a2f/go.mod h1:trKMm47ItrrSyZjeys2JHOavsTK7YGwYAxmcfO2/cG8=
+github.com/google/uuid v1.2.0 h1:qJYtXnJRWmpe7m/3XlyhrsLrEURqHRM2kxzoxXqyUDs=
+github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=
 github.com/jmespath/go-jmespath/internal/testify v1.5.1 h1:shLQSRRSCCPj3f2gpwzGwWFoC7ycTf1rcQZHOlsJ6N8=
