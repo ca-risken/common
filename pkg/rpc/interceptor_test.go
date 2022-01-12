@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/sirupsen/logrus"
+	"github.com/ca-risken/common/pkg/logging"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 )
@@ -13,7 +13,7 @@ import (
 const longErrorMessage = "あいうえおかきくけこさしすせそたちつてとなにぬねのあいうえおかきくけこさしすせそたちつてとなにぬねのあいうえおかきくけこさしすせそたちつてとなにぬねのあいうえおかきくけこさしすせそたちつてとなにぬねのあ"
 
 func TestLoggingUnaryServerInterceptor(t *testing.T) {
-	logger := logrus.New()
+	logger := logging.NewLogger()
 	interceptor := LoggingUnaryServerInterceptor(logger)
 	info := &grpc.UnaryServerInfo{
 		Server:     nil,
