@@ -1,8 +1,8 @@
 github.com/aws/aws-sdk-go v1.37.10/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
 github.com/aws/aws-sdk-go v1.40.44 h1:kECaYybTWYZY5IKHvQMxbE6Wi5Qrb+7hbkV7zQV3Sg8=
 github.com/aws/aws-sdk-go v1.40.44/go.mod h1:585smgzpB/KqRA+K3y/NL/oYRqQvpNJYvLm+LY1U59Q=
-github.com/ca-risken/common/pkg/logging v0.0.0-20220112083229-da961170dec3 h1:RFahm7AkSyZPEUK/SaMhI3EYiC5a3a9dYXfl6nZRF78=
-github.com/ca-risken/common/pkg/logging v0.0.0-20220112083229-da961170dec3/go.mod h1:dmZZ5/wkGbsmAMbhuC7YK6uJOMAlS4OndoM0DQyPhi8=
+github.com/ca-risken/common/pkg/logging v0.0.0-20220113014249-f285e209578f h1:p66BA82ik+Uc/y5yaPSS1e6JS5Skh9JCajnVA6bLHJQ=
+github.com/ca-risken/common/pkg/logging v0.0.0-20220113014249-f285e209578f/go.mod h1:dmZZ5/wkGbsmAMbhuC7YK6uJOMAlS4OndoM0DQyPhi8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

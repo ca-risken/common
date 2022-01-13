@@ -3,7 +3,7 @@ module github.com/ca-risken/common/pkg/rpc
 go 1.17
 
 require (
-	github.com/ca-risken/common/pkg/logging v0.0.0-20220112075040-5a11f5fc5031
+	github.com/ca-risken/common/pkg/logging v0.0.0-20220113014249-f285e209578f
 	github.com/stretchr/testify v1.7.0
 	google.golang.org/grpc v1.42.0
 )
