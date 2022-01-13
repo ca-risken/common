@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sync/atomic"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -52,11 +51,11 @@ type Logger interface {
 	Fatal(args ...interface{})
 	Panic(args ...interface{})
 
-	SetLevel(level Level)
-	SetOutput(w io.Writer)
+	Level(level Level)
+	Output(w io.Writer)
 	GenerateRequestID(prefix string) (string, error)
-	MustNotify(level Level, args ...interface{})
-	MustNotifyf(level Level, format string, args ...interface{})
+	Notify(level Level, args ...interface{})
+	Notifyf(level Level, format string, args ...interface{})
 	WithItems(level Level, fields map[string]interface{}, args ...interface{})
 	WithItemsf(level Level, fields map[string]interface{}, format string, args ...interface{})
 }
@@ -131,20 +130,35 @@ func (a *AppLogger) Panic(args ...interface{}) {
 	a.Log(logrus.PanicLevel, args...)
 }
 
-func (a *AppLogger) parseLogrusLevel(i interface{}) logrus.Level {
-	if level, ok := i.(logrus.Level); ok {
-		return level
+func parseLogrusLevel(l Level) logrus.Level {
+	switch l {
+	case PanicLevel:
+		return logrus.PanicLevel
+	case FatalLevel:
+		return logrus.FatalLevel
+	case ErrorLevel:
+		return logrus.ErrorLevel
+	case WarnLevel:
+		return logrus.WarnLevel
+	case InfoLevel:
+		return logrus.InfoLevel
+	case DebugLevel:
+		return logrus.DebugLevel
+	case TraceLevel:
+		return logrus.TraceLevel
+	default:
+		return logrus.InfoLevel
 	}
-	return a.Level // return default level
 }
 
-func (a *AppLogger) SetLevel(level Level) {
-	atomic.StoreUint32((*uint32)(&a.Level), uint32(level))
+func (a *AppLogger) Level(level Level) {
+	a.SetLevel(parseLogrusLevel(level))
 }
 
-func (a *AppLogger) SetOutput(w io.Writer) {
-	a.Out = w
+func (a *AppLogger) Output(w io.Writer) {
+	a.SetOutput(w)
 }
+
 func (a *AppLogger) GenerateRequestID(prefix string) (string, error) {
 	u, err := uuid.NewRandom()
 	if err != nil {
@@ -157,16 +171,16 @@ const (
 	notifyKey = "notify"
 )
 
-func (a *AppLogger) MustNotify(level Level, args ...interface{}) {
+func (a *AppLogger) Notify(level Level, args ...interface{}) {
 	a.WithFields(logrus.Fields{
 		"notify": true,
-	}).Log(a.parseLogrusLevel(level), args...)
+	}).Log(parseLogrusLevel(level), args...)
 }
 
-func (a *AppLogger) MustNotifyf(level Level, format string, args ...interface{}) {
+func (a *AppLogger) Notifyf(level Level, format string, args ...interface{}) {
 	a.WithFields(logrus.Fields{
 		"notify": true,
-	}).Logf(a.parseLogrusLevel(level), format, args...)
+	}).Logf(parseLogrusLevel(level), format, args...)
 }
 
 func (a *AppLogger) WithItems(level Level, fields map[string]interface{}, args ...interface{}) {
@@ -174,7 +188,7 @@ func (a *AppLogger) WithItems(level Level, fields map[string]interface{}, args .
 	for k, v := range fields {
 		f[k] = v
 	}
-	a.WithFields(f).Log(a.parseLogrusLevel(level), args...)
+	a.WithFields(f).Log(parseLogrusLevel(level), args...)
 }
 
 func (a *AppLogger) WithItemsf(level Level, fields map[string]interface{}, format string, args ...interface{}) {
@@ -182,5 +196,5 @@ func (a *AppLogger) WithItemsf(level Level, fields map[string]interface{}, forma
 	for k, v := range fields {
 		f[k] = v
 	}
-	a.WithFields(f).Logf(a.parseLogrusLevel(level), format, args...)
+	a.WithFields(f).Logf(parseLogrusLevel(level), format, args...)
 }
