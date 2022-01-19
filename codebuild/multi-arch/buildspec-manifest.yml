@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_PREFIX: "middleware"
+    IMAGE_PREFIX: "risken-middleware"
   parameter-store:
     GITHUB_USER: "/build/GITHUB_USER"
     GITHUB_TOKEN: "/build/GITHUB_TOKEN"
@@ -16,6 +16,7 @@ phases:
   pre_build:
     commands:
       - echo Setting environment variables
+      - MIDDLEWARE=${CODEBUILD_SRC_DIR}/middleware
       - MANIFEST_TAG=v0.0.${CODEBUILD_BUILD_NUMBER}
       - IMAGE_TAG_BASE=$(git rev-parse --short HEAD)
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
@@ -28,13 +29,13 @@ phases:
   build:
     commands:
       - echo Create manifests...
-      - make create-manifest -j IMAGE_REGISTRY=${REGISTRY} IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG_BASE=${IMAGE_TAG_BASE} MANIFEST_TAG=${MANIFEST_TAG}
-      - make create-manifest -j IMAGE_REGISTRY=${REGISTRY} IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG_BASE=${IMAGE_TAG_BASE} MANIFEST_TAG=latest
+      - cd ${MIDDLEWARE} && make create-manifest -j IMAGE_REGISTRY=${REGISTRY} IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG_BASE=${IMAGE_TAG_BASE} MANIFEST_TAG=${MANIFEST_TAG}
+      - cd ${MIDDLEWARE} && make create-manifest -j IMAGE_REGISTRY=${REGISTRY} IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG_BASE=${IMAGE_TAG_BASE} MANIFEST_TAG=latest
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker manifest...
-      - make push-manifest -j IMAGE_REGISTRY=${REGISTRY} IMAGE_PREFIX=${IMAGE_PREFIX} MANIFEST_TAG=${MANIFEST_TAG}
-      - make push-manifest -j IMAGE_REGISTRY=${REGISTRY} IMAGE_PREFIX=${IMAGE_PREFIX} MANIFEST_TAG=latest
+      - cd ${MIDDLEWARE} && make push-manifest -j IMAGE_REGISTRY=${REGISTRY} IMAGE_PREFIX=${IMAGE_PREFIX} MANIFEST_TAG=${MANIFEST_TAG}
+      - cd ${MIDDLEWARE} && make push-manifest -j IMAGE_REGISTRY=${REGISTRY} IMAGE_PREFIX=${IMAGE_PREFIX} MANIFEST_TAG=latest
 
