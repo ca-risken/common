@@ -41,7 +41,7 @@ pull-image: $(IMAGE_PULL_TARGETS)
 PHONY: tag-image $(IMAGE_TAG_TARGETS)
 tag-image: $(IMAGE_TAG_TARGETS)
 %.tag-image:
-	docker tag $(SOURCE_IMAGE_PREFIX)/$(*):$(IMAGE_TAG) $(IMAGE_REGISTRY)/$(IMAGE_PREFIX)/$(*):$(IMAGE_TAG)
+	docker tag $(SOURCE_IMAGE_PREFIX)/$(*):$(SOURCE_IMAGE_TAG) $(IMAGE_REGISTRY)/$(IMAGE_PREFIX)/$(*):$(IMAGE_TAG)
 
 PHONY: create-manifest $(MANIFEST_CREATE_TARGETS)
 create-manifest: $(MANIFEST_CREATE_TARGETS)
