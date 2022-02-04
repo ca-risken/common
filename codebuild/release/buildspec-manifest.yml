@@ -20,6 +20,7 @@ phases:
       - echo Setting environment variables
       - export DOCKER_CLI_EXPERIMENTAL=enabled
       - TAG=${CODEBUILD_WEBHOOK_TRIGGER#tag/}
+      - MIDDLEWARE=${CODEBUILD_SRC_DIR}/middleware
 
       - echo Logging in to Amazon ECR...
       - aws --version
