@@ -25,6 +25,8 @@ const (
 	Datadog
 )
 
+const tracerName = "github.com/ca-risken/common/pkg/trace"
+
 func (t ExporterType) String() string {
 	switch t {
 	case NOP:
