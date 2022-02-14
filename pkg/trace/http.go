@@ -12,8 +12,6 @@ import (
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
-const tracerName = "github.com/ca-risken/common/pkg/trace"
-
 type recordingResponseWriter struct {
 	writer  http.ResponseWriter
 	written bool
