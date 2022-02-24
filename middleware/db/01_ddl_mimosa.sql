@@ -380,23 +380,6 @@ CREATE TABLE diagnosis_data_source (
   PRIMARY KEY(diagnosis_data_source_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
-CREATE TABLE jira_setting (
-  jira_setting_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  name VARCHAR(50) NOT NULL,
-  diagnosis_data_source_id INT UNSIGNED NOT NULL,
-  project_id INT UNSIGNED NOT NULL,
-  identity_field VARCHAR(50),
-  identity_value VARCHAR(50),
-  jira_id VARCHAR(50),
-  jira_key VARCHAR(50),
-  status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
-  status_detail VARCHAR(255) NULL,
-  scan_at DATETIME NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(jira_setting_id)
-) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
-
 CREATE TABLE wpscan_setting (
   wpscan_setting_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   diagnosis_data_source_id INT UNSIGNED NOT NULL,

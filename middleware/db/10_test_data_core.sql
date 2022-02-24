@@ -40,7 +40,7 @@ INSERT INTO access_token_role(access_token_id, role_id) VALUES
 INSERT INTO finding(finding_id, description, data_source, data_source_id, resource_name, project_id, original_score, score, data) VALUES
   (1001, 'desc-1001', 'aws:guard-duty', 'guard-duty-0001', 'arn:aws:s3:::example-bucket',      1001, 100.00, 1.00, '{"data":{"key":"value"}}'),
   (1002, 'desc-1002', 'aws:guard-duty', 'guard-duty-0002', 'arn:aws:s3:::example-bucket',      1001, 99.05, 0.99,  '{"data":{"key":"value"}}'),
-  (1003, 'desc-1003', 'diagnosis:jira', 'jira-0001',       'Cross Site Sciripting',            1001, 100.00, 1.00, '{"data":{"key":"value"}}'),
+  (1003, 'desc-1003', 'osint:website',  'website-0001',    'example-tool.',                    1001, 100.00, 1.00, '{"data":{"key":"value"}}'),
   (1004, 'desc-1004', 'aws:guard-duty', 'guard-duty-1004', 'arn:aws:s3:::example-bucket-1004', 1001, 10.00, 0.5, '{"data":{"key":"value"}}'),
   (1005, 'desc-1005', 'aws:guard-duty', 'guard-duty-1005', 'arn:aws:s3:::example-bucket-1005', 1001, 10.00, 0.5, '{"data":{"key":"value"}}'),
   (1006, 'desc-1006', 'aws:guard-duty', 'guard-duty-1006', 'arn:aws:s3:::example-bucket-1006', 1001, 10.00, 0.5, '{"data":{"key":"value"}}'),
