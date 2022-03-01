@@ -10,12 +10,13 @@ func TestStart(t *testing.T) {
 	// valid ProfileTypes
 	c := &Config{
 		ProfileTypes: []ProfileType{
-			CPUProfile,
-			HeapProfile,
-			BlockProfile,
-			MutexProfile,
-			GoroutineProfile,
+			ProfileTypeCPUProfile,
+			ProfileTypeHeapProfile,
+			ProfileTypeBlockProfile,
+			ProfileTypeMutexProfile,
+			ProfileTypeGoroutineProfile,
 		},
+		ExporterType: ExporterTypeNOP,
 	}
 	err := c.Start()
 	assert.NoError(t, err)
@@ -26,10 +27,21 @@ func TestStart(t *testing.T) {
 	}}
 	err = c.Start()
 	assert.Error(t, err)
+
+	// invalid ExporterType
+	c = &Config{ExporterType: 9}
+	err = c.Start()
+	assert.Error(t, err)
 }
 
-func TestConvertFrom(t *testing.T) {
+func TestConvertProfileTypeFrom(t *testing.T) {
 	// invalid ProfileType string
-	_, err := ConvertFrom([]string{"Undefined"})
+	_, err := ConvertProfileTypeFrom([]string{"Undefined"})
+	assert.Error(t, err)
+}
+
+func TestConvertExporterTypeFrom(t *testing.T) {
+	// invalid ExporterType string
+	_, err := ConvertExporterTypeFrom("Undefined")
 	assert.Error(t, err)
 }

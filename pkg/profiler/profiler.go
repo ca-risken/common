@@ -1,7 +1,6 @@
 package profiler
 
 import (
-	"errors"
 	"fmt"
 
 	ddprofiler "gopkg.in/DataDog/dd-trace-go.v1/profiler"
@@ -10,19 +9,27 @@ import (
 type ProfileType int
 
 const (
-	Undefined ProfileType = iota
-	CPUProfile
-	HeapProfile
-	BlockProfile
-	MutexProfile
-	GoroutineProfile
+	ProfileTypeUndefined ProfileType = iota
+	ProfileTypeCPUProfile
+	ProfileTypeHeapProfile
+	ProfileTypeBlockProfile
+	ProfileTypeMutexProfile
+	ProfileTypeGoroutineProfile
+)
+
+type ExporterType int
+
+const (
+	ExporterTypeUndefined ExporterType = iota
+	ExporterTypeNOP
+	ExporterTypeDatadog
 )
 
 type Config struct {
 	ServiceName  string
 	EnvName      string
 	ProfileTypes []ProfileType
-	UseDatadog   bool
+	ExporterType
 }
 
 func (c *Config) Start() error {
@@ -37,57 +44,73 @@ func (c *Config) Start() error {
 	} else {
 		for _, t := range c.ProfileTypes {
 			switch t {
-			case CPUProfile:
+			case ProfileTypeCPUProfile:
 				pTypes = append(pTypes, ddprofiler.CPUProfile)
-			case HeapProfile:
+			case ProfileTypeHeapProfile:
 				pTypes = append(pTypes, ddprofiler.HeapProfile)
-			case BlockProfile:
+			case ProfileTypeBlockProfile:
 				pTypes = append(pTypes, ddprofiler.BlockProfile)
-			case MutexProfile:
+			case ProfileTypeMutexProfile:
 				pTypes = append(pTypes, ddprofiler.MutexProfile)
-			case GoroutineProfile:
+			case ProfileTypeGoroutineProfile:
 				pTypes = append(pTypes, ddprofiler.GoroutineProfile)
 			default:
-				return errors.New(fmt.Sprintf("undefined Profile Type: %v", c.ProfileTypes))
+				return fmt.Errorf("undefined Profile Type: %v", c.ProfileTypes)
 			}
 		}
 	}
 
 	var err error
-	if c.UseDatadog {
+	switch c.ExporterType {
+	case ExporterTypeDatadog:
 		err = ddprofiler.Start(
 			ddprofiler.WithService(c.ServiceName),
 			ddprofiler.WithEnv(c.EnvName),
 			ddprofiler.WithProfileTypes(pTypes...),
 		)
+	case ExporterTypeNOP:
+		// nop
+	default:
+		err = fmt.Errorf("undefined Profile Exporter: %d", c.ExporterType)
 	}
-	// nop when not specify datadog profiler
 	return err
 }
 
 func (c *Config) Stop() {
-	if c.UseDatadog {
+	switch c.ExporterType {
+	case ExporterTypeDatadog:
 		ddprofiler.Stop()
 	}
 }
 
-func ConvertFrom(typeStrings []string) ([]ProfileType, error) {
+func ConvertProfileTypeFrom(typeStrings []string) ([]ProfileType, error) {
 	var ret []ProfileType
 	for _, ts := range typeStrings {
 		switch ts {
 		case "CPU":
-			ret = append(ret, CPUProfile)
+			ret = append(ret, ProfileTypeCPUProfile)
 		case "Heap":
-			ret = append(ret, HeapProfile)
+			ret = append(ret, ProfileTypeHeapProfile)
 		case "Block":
-			ret = append(ret, BlockProfile)
+			ret = append(ret, ProfileTypeBlockProfile)
 		case "Mutex":
-			ret = append(ret, MutexProfile)
+			ret = append(ret, ProfileTypeMutexProfile)
 		case "Goroutine":
-			ret = append(ret, GoroutineProfile)
+			ret = append(ret, ProfileTypeGoroutineProfile)
 		default:
-			return ret, errors.New(fmt.Sprintf("undefined Profile Type: %s", ts))
+			return ret, fmt.Errorf("undefined Profile Type: %s", ts)
 		}
 	}
 	return ret, nil
+}
+
+func ConvertExporterTypeFrom(typeString string) (ExporterType, error) {
+	switch typeString {
+	case "nop":
+		return ExporterTypeNOP, nil
+	case "datadog":
+		return ExporterTypeDatadog, nil
+	default:
+		return ExporterTypeUndefined, fmt.Errorf("undefined Profile Exporter Type: %s", typeString)
+	}
 }
