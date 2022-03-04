@@ -19,37 +19,37 @@ import (
 type ExporterType int
 
 const (
-	Undefined ExporterType = iota
-	NOP
-	Stdout
-	Datadog
+	ExporterTypeUndefined ExporterType = iota
+	ExporterTypeNOP
+	ExporterTypeStdout
+	ExporterTypeDatadog
 )
 
 const tracerName = "github.com/ca-risken/common/pkg/trace"
 
 func (t ExporterType) String() string {
 	switch t {
-	case NOP:
+	case ExporterTypeNOP:
 		return "nop"
-	case Stdout:
+	case ExporterTypeStdout:
 		return "stdout"
-	case Datadog:
+	case ExporterTypeDatadog:
 		return "datadog"
 	default:
 		return "undefined"
 	}
 }
 
-func GetExporterType(typeString string) ExporterType {
+func ConvertExporterTypeFrom(typeString string) (ExporterType, error) {
 	switch typeString {
 	case "nop":
-		return NOP
+		return ExporterTypeNOP, nil
 	case "stdout":
-		return Stdout
+		return ExporterTypeStdout, nil
 	case "datadog":
-		return Datadog
+		return ExporterTypeDatadog, nil
 	default:
-		return Undefined
+		return ExporterTypeUndefined, fmt.Errorf("undefined Trace Exporter Type: %s", typeString)
 	}
 }
 
@@ -68,12 +68,12 @@ func Init(ctx context.Context, config *Config) (*trace.TracerProvider, error) {
 	var exporter trace.SpanExporter
 	var err error
 	switch config.ExporterType {
-	case NOP:
+	case ExporterTypeNOP:
 		exporter, err = stdouttrace.New(
 			stdouttrace.WithWriter(io.Discard))
-	case Stdout:
+	case ExporterTypeStdout:
 		exporter, err = stdouttrace.New()
-	case Datadog:
+	case ExporterTypeDatadog:
 		client := otlptracehttp.NewClient()
 		exporter, err = otlptrace.New(ctx, client)
 	default:

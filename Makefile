@@ -1,4 +1,4 @@
-PKG_TARGETS = database logging portscan sqs xray rpc trace
+PKG_TARGETS = database logging portscan sqs xray rpc trace profiler
 LINT_TARGETS = $(PKG_TARGETS:=.lint)
 
 .PHONY: lint
