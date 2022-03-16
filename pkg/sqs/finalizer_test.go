@@ -17,7 +17,7 @@ var (
 func TestFinal(t *testing.T) {
 	type args struct {
 		ProjectID  *uint32
-		DataSource string
+		DataSource DataSourceRecommnend
 		Err        error
 	}
 	mockClient := mocks.FindingServiceClient{}
@@ -38,7 +38,7 @@ func TestFinal(t *testing.T) {
 			name: "OK(no scan error)",
 			input: args{
 				ProjectID:  &sampleProjectID,
-				DataSource: "google:scc",
+				DataSource: &sampleDataSourceRecommend{},
 				Err:        nil,
 			},
 			mockResp: mockResponse{
@@ -53,7 +53,7 @@ func TestFinal(t *testing.T) {
 			name: "OK(exists scan error)",
 			input: args{
 				ProjectID:  &sampleProjectID,
-				DataSource: "google:scc",
+				DataSource: &sampleDataSourceRecommend{},
 				Err:        errors.New("Failed to scan"),
 			},
 			mockResp: mockResponse{
@@ -68,7 +68,7 @@ func TestFinal(t *testing.T) {
 			name: "ProjectID is nil(error)",
 			input: args{
 				ProjectID:  nil,
-				DataSource: "google:scc",
+				DataSource: &sampleDataSourceRecommend{},
 				Err:        errors.New("Failed to scan"),
 			},
 			mockResp: mockResponse{},
@@ -78,7 +78,7 @@ func TestFinal(t *testing.T) {
 			name: "ProjectID is nil(no error)",
 			input: args{
 				ProjectID:  nil,
-				DataSource: "google:scc",
+				DataSource: &sampleDataSourceRecommend{},
 				Err:        nil,
 			},
 			mockResp: mockResponse{},
@@ -88,7 +88,7 @@ func TestFinal(t *testing.T) {
 			name: "Failed to PutFinding API",
 			input: args{
 				ProjectID:  &sampleProjectID,
-				DataSource: "google:scc",
+				DataSource: &sampleDataSourceRecommend{},
 				Err:        nil,
 			},
 			mockResp: mockResponse{
@@ -103,7 +103,7 @@ func TestFinal(t *testing.T) {
 			name: "Failed to PutRecommend API",
 			input: args{
 				ProjectID:  &sampleProjectID,
-				DataSource: "google:scc",
+				DataSource: &sampleDataSourceRecommend{},
 				Err:        nil,
 			},
 			mockResp: mockResponse{
@@ -139,4 +139,18 @@ func TestFinal(t *testing.T) {
 			}
 		})
 	}
+}
+
+type sampleDataSourceRecommend struct{}
+
+func (s *sampleDataSourceRecommend) DataSource() string {
+	return "namespace:datasource"
+}
+
+func (s *sampleDataSourceRecommend) ScanFailureRisk() string {
+	return "Failed to scan, So you are not gathering the latest security threat information."
+}
+
+func (s *sampleDataSourceRecommend) ScanFailureRecommend() string {
+	return "Please review the following items and rescan, ...."
 }

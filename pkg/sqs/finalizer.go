@@ -21,8 +21,18 @@ func NewFinalizer(findingSvcAddr string) *Finalizer {
 	}
 }
 
+// DataSourceRecommnend needs to implement scan failure recommendations contents per datasource
+type DataSourceRecommnend interface {
+	// DataSource returns the DataSource identifier string.(e.g. 'aws:portscan')
+	DataSource() string
+	// ScanFailureRisk returns risk information in case of scan failure.
+	ScanFailureRisk() string
+	// ScanFailureRecommend returns information on what action is required in case of scan failure.
+	ScanFailureRecommend() string
+}
+
 // FinalizeHandler returns a Handler that wraps the termination process
-func (f *Finalizer) FinalizeHandler(datasource string, next Handler) Handler {
+func (f *Finalizer) FinalizeHandler(datasource DataSourceRecommnend, next Handler) Handler {
 	return HandlerFunc(func(ctx context.Context, sqsMsg *sqs.Message) error {
 		err := next.HandleMessage(ctx, sqsMsg)
 		projectID, parseErr := parseProjectFromMessage(aws.StringValue(sqsMsg.Body))
@@ -46,22 +56,29 @@ func parseProjectFromMessage(msg string) (uint32, error) {
 	return message.ProjectID, nil
 }
 
+type recommend struct {
+	Risk           string `json:"risk,omitempty"`
+	Recommendation string `json:"recommendation,omitempty"`
+}
+
 // Final summarizes the termination scan process
-func (f *Finalizer) Final(ctx context.Context, projectID *uint32, datasource string, err error) error {
+func (f *Finalizer) Final(ctx context.Context, projectID *uint32, datasource DataSourceRecommnend, err error) error {
 	if projectID == nil {
 		// Unknown project
 		appLogger.Notifyf(logging.ErrorLevel, "Unknown project, err: %+v", err)
 		return err
 	}
-	r := getRecommend(datasource)
 	if err != nil {
 		// Scan failed
 		if putErr := f.putScanFinding(ctx, projectID, &ScanFinding{
 			ProjectID:    *projectID,
-			DataSource:   datasource,
+			DataSource:   datasource.DataSource(),
 			Status:       "Error",
 			ErrorMessage: err.Error(),
-			Recommend:    r,
+			Recommend: recommend{
+				Risk:           datasource.ScanFailureRisk(),
+				Recommendation: datasource.ScanFailureRecommend(),
+			},
 		}); putErr != nil {
 			appLogger.Notifyf(logging.ErrorLevel, "Failed to putScanFinding (scan failed), project_id: %d, err: %+v", *projectID, putErr)
 			return err
@@ -72,9 +89,12 @@ func (f *Finalizer) Final(ctx context.Context, projectID *uint32, datasource str
 	// Scan succeeded
 	if putErr := f.putScanFinding(ctx, projectID, &ScanFinding{
 		ProjectID:  *projectID,
-		DataSource: datasource,
+		DataSource: datasource.DataSource(),
 		Status:     "OK",
-		Recommend:  r,
+		Recommend: recommend{
+			Risk:           datasource.ScanFailureRisk(),
+			Recommendation: datasource.ScanFailureRecommend(),
+		},
 	}); putErr != nil {
 		appLogger.Notifyf(logging.ErrorLevel, "Failed to putScanFinding (scan succeeded), project_id: %d, err: %+v", *projectID, putErr)
 		return nil
