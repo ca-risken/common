@@ -36,8 +36,8 @@ func (f *Finalizer) FinalizeHandler(datasource DataSourceRecommnend, next Handle
 	return HandlerFunc(func(ctx context.Context, sqsMsg *sqs.Message) error {
 		err := next.HandleMessage(ctx, sqsMsg)
 		projectID, parseErr := parseProjectFromMessage(aws.StringValue(sqsMsg.Body))
-		if err != nil {
-			appLogger.Errorf("Invalid message(failed to get projetc_id): sqsMsg=%+v, err=%+v", sqsMsg, parseErr)
+		if parseErr != nil {
+			appLogger.Errorf("Invalid message(failed to get project_id): sqsMsg=%+v, err=%+v", sqsMsg, parseErr)
 			return f.Final(ctx, nil, datasource, err)
 		}
 		return f.Final(ctx, &projectID, datasource, err)
