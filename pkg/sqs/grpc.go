@@ -2,6 +2,7 @@ package sqs
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/ca-risken/core/proto/finding"
@@ -9,13 +10,13 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func newFindingClient(svcAddr string) finding.FindingServiceClient {
+func newFindingClient(svcAddr string) (finding.FindingServiceClient, error) {
 	ctx := context.Background()
 	conn, err := getGRPCConn(ctx, svcAddr)
 	if err != nil {
-		appLogger.Fatalf("Faild to get GRPC connection: err=%+v", err)
+		return nil, fmt.Errorf("Faild to get GRPC connection: err=%+v", err)
 	}
-	return finding.NewFindingServiceClient(conn)
+	return finding.NewFindingServiceClient(conn), nil
 }
 
 func getGRPCConn(ctx context.Context, addr string) (*grpc.ClientConn, error) {

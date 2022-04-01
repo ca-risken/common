@@ -25,9 +25,10 @@ func TestGenerateRecommendation(t *testing.T) {
 		override   *DataSourceRecommnend
 	}
 	cases := []struct {
-		name  string
-		input args
-		want  *DataSourceRecommnend
+		name    string
+		input   args
+		want    *DataSourceRecommnend
+		wantErr bool
 	}{
 		{
 			name: "OK",
@@ -47,10 +48,10 @@ func TestGenerateRecommendation(t *testing.T) {
 			},
 		},
 		{
-			name: "Ovverride",
+			name: "OK Override",
 			input: args{
 				datasource: sampleDataSource,
-				settingURL: sampleSettingURL,
+				settingURL: "",
 				override: &DataSourceRecommnend{
 					ScanFailureRisk:           "overriden risk",
 					ScanFailureRecommendation: "overriden recommendation",
@@ -62,26 +63,32 @@ func TestGenerateRecommendation(t *testing.T) {
 			},
 		},
 		{
-			name: "Blank",
+			name: "NG required datasource",
 			input: args{
 				datasource: "",
+				settingURL: sampleSettingURL,
+				override:   nil,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "NG required settingURL",
+			input: args{
+				datasource: sampleDataSource,
 				settingURL: "",
 				override:   nil,
 			},
-			want: &DataSourceRecommnend{
-				ScanFailureRisk: "Failed to scan , So you are not gathering the latest security threat information.",
-				ScanFailureRecommendation: `Please review the following items and rescan,
-	- Ensure the error message of the DataSource.
-	- Ensure the access rights you set for the DataSource and the reachability of the network.
-	- Refer to the documentation to make sure you have not omitted any of the steps you have set up.
-	- 
-	- If this does not resolve the problem, or if you suspect that the problem is server-side, please contact the system administrators.`,
-			},
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			got := generateRecommendation(c.input.datasource, c.input.settingURL, c.input.override)
+			got, err := generateRecommendation(c.input.datasource, c.input.settingURL, c.input.override)
+			if (c.wantErr && err == nil) || (!c.wantErr && err != nil) {
+				t.Fatalf("Unexpected error: wantErr=%t, err=%+v", c.wantErr, err)
+			}
 			if !reflect.DeepEqual(c.want, got) {
 				t.Fatalf("Unexpected data match: want=%+v, got=%+v", c.want, got)
 			}

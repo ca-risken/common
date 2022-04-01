@@ -19,12 +19,20 @@ type Finalizer struct {
 
 // NewFinalizer returns a Finalizer instance and generates recommendation contents for scan failure from the datasource and settingURL parameter.
 // If set overrideRecommendation, the above contents will be overridden.
-func NewFinalizer(datasource, settingURL, findingSvcAddr string, overrideRecommendation *DataSourceRecommnend) *Finalizer {
+func NewFinalizer(datasource, settingURL, findingSvcAddr string, overrideRecommendation *DataSourceRecommnend) (*Finalizer, error) {
+	r, err := generateRecommendation(datasource, settingURL, overrideRecommendation)
+	if err != nil {
+		return nil, err
+	}
+	fc, err := newFindingClient(findingSvcAddr)
+	if err != nil {
+		return nil, err
+	}
 	return &Finalizer{
 		datasource:     datasource,
-		recommendation: generateRecommendation(datasource, settingURL, overrideRecommendation),
-		findingClient:  newFindingClient(findingSvcAddr),
-	}
+		recommendation: r,
+		findingClient:  fc,
+	}, nil
 }
 
 const (
@@ -44,7 +52,13 @@ type DataSourceRecommnend struct {
 	ScanFailureRecommendation string `json:"scan_failure_recommendation,omitempty"`
 }
 
-func generateRecommendation(datasource, settingURL string, override *DataSourceRecommnend) *DataSourceRecommnend {
+func generateRecommendation(datasource, settingURL string, override *DataSourceRecommnend) (*DataSourceRecommnend, error) {
+	if datasource == "" {
+		return nil, fmt.Errorf("Required datasource")
+	}
+	if settingURL == "" && override == nil {
+		return nil, fmt.Errorf("Required settingURL")
+	}
 	recommend := DataSourceRecommnend{
 		ScanFailureRisk:           fmt.Sprintf(scanFailureRiskTemplate, datasource),
 		ScanFailureRecommendation: fmt.Sprintf(scanFailureRecommendTemplate, settingURL),
@@ -53,7 +67,7 @@ func generateRecommendation(datasource, settingURL string, override *DataSourceR
 		recommend.ScanFailureRisk = override.ScanFailureRisk
 		recommend.ScanFailureRecommendation = override.ScanFailureRecommendation
 	}
-	return &recommend
+	return &recommend, nil
 }
 
 // FinalizeHandler returns a Handler that wraps the termination process
