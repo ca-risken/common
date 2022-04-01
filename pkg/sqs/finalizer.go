@@ -12,35 +12,74 @@ import (
 )
 
 type Finalizer struct {
-	findingClient finding.FindingServiceClient
+	datasource     string
+	recommendation *DataSourceRecommnend
+	findingClient  finding.FindingServiceClient
 }
 
-func NewFinalizer(findingSvcAddr string) *Finalizer {
-	return &Finalizer{
-		findingClient: newFindingClient(findingSvcAddr),
+// NewFinalizer returns a Finalizer instance and generates recommendation contents for scan failure from the datasource and settingURL parameter.
+// If set overrideRecommendation, the above contents will be overridden.
+func NewFinalizer(datasource, settingURL, findingSvcAddr string, overrideRecommendation *DataSourceRecommnend) (*Finalizer, error) {
+	r, err := generateRecommendation(datasource, settingURL, overrideRecommendation)
+	if err != nil {
+		return nil, err
 	}
+	fc, err := newFindingClient(findingSvcAddr)
+	if err != nil {
+		return nil, err
+	}
+	return &Finalizer{
+		datasource:     datasource,
+		recommendation: r,
+		findingClient:  fc,
+	}, nil
 }
 
-// DataSourceRecommnend needs to implement scan failure recommendations contents per datasource
-type DataSourceRecommnend interface {
-	// DataSource returns the DataSource identifier string.(e.g. 'aws:portscan')
-	DataSource() string
-	// ScanFailureRisk returns risk information in case of scan failure.
-	ScanFailureRisk() string
-	// ScanFailureRecommend returns information on what action is required in case of scan failure.
-	ScanFailureRecommend() string
+const (
+	scanFailureRiskTemplate      = "Failed to scan %s, So you are not gathering the latest security threat information."
+	scanFailureRecommendTemplate = `Please review the following items and rescan,
+	- Ensure the error message of the DataSource.
+	- Ensure the access rights you set for the DataSource and the reachability of the network.
+	- Refer to the documentation to make sure you have not omitted any of the steps you have set up.
+	- %s
+	- If this does not resolve the problem, or if you suspect that the problem is server-side, please contact the system administrators.`
+)
+
+type DataSourceRecommnend struct {
+	// ScanFailureRisk is risk information in case of scan failure.
+	ScanFailureRisk string `json:"scan_failure_risk,omitempty"`
+	// ScanFailureRecommendation is information on what action is required in case of scan failure.
+	ScanFailureRecommendation string `json:"scan_failure_recommendation,omitempty"`
+}
+
+func generateRecommendation(datasource, settingURL string, override *DataSourceRecommnend) (*DataSourceRecommnend, error) {
+	if datasource == "" {
+		return nil, fmt.Errorf("Required datasource")
+	}
+	if settingURL == "" && override == nil {
+		return nil, fmt.Errorf("Required settingURL")
+	}
+	recommend := DataSourceRecommnend{
+		ScanFailureRisk:           fmt.Sprintf(scanFailureRiskTemplate, datasource),
+		ScanFailureRecommendation: fmt.Sprintf(scanFailureRecommendTemplate, settingURL),
+	}
+	if override != nil {
+		recommend.ScanFailureRisk = override.ScanFailureRisk
+		recommend.ScanFailureRecommendation = override.ScanFailureRecommendation
+	}
+	return &recommend, nil
 }
 
 // FinalizeHandler returns a Handler that wraps the termination process
-func (f *Finalizer) FinalizeHandler(datasource DataSourceRecommnend, next Handler) Handler {
+func (f *Finalizer) FinalizeHandler(next Handler) Handler {
 	return HandlerFunc(func(ctx context.Context, sqsMsg *sqs.Message) error {
 		err := next.HandleMessage(ctx, sqsMsg)
 		projectID, parseErr := parseProjectFromMessage(aws.StringValue(sqsMsg.Body))
 		if parseErr != nil {
 			appLogger.Errorf("Invalid message(failed to get project_id): sqsMsg=%+v, err=%+v", sqsMsg, parseErr)
-			return f.Final(ctx, nil, datasource, err)
+			return f.Final(ctx, nil, err)
 		}
-		return f.Final(ctx, &projectID, datasource, err)
+		return f.Final(ctx, &projectID, err)
 	})
 }
 
@@ -56,13 +95,8 @@ func parseProjectFromMessage(msg string) (uint32, error) {
 	return message.ProjectID, nil
 }
 
-type recommend struct {
-	Risk           string `json:"risk,omitempty"`
-	Recommendation string `json:"recommendation,omitempty"`
-}
-
 // Final summarizes the termination scan process
-func (f *Finalizer) Final(ctx context.Context, projectID *uint32, datasource DataSourceRecommnend, err error) error {
+func (f *Finalizer) Final(ctx context.Context, projectID *uint32, err error) error {
 	if projectID == nil {
 		// Unknown project
 		appLogger.Notifyf(logging.ErrorLevel, "Unknown project, err: %+v", err)
@@ -72,12 +106,12 @@ func (f *Finalizer) Final(ctx context.Context, projectID *uint32, datasource Dat
 		// Scan failed
 		if putErr := f.putScanFinding(ctx, projectID, &ScanFinding{
 			ProjectID:    *projectID,
-			DataSource:   datasource.DataSource(),
+			DataSource:   f.datasource,
 			Status:       "Error",
 			ErrorMessage: err.Error(),
-			Recommend: recommend{
-				Risk:           datasource.ScanFailureRisk(),
-				Recommendation: datasource.ScanFailureRecommend(),
+			Recommendation: &DataSourceRecommnend{
+				ScanFailureRisk:           f.recommendation.ScanFailureRisk,
+				ScanFailureRecommendation: f.recommendation.ScanFailureRecommendation,
 			},
 		}); putErr != nil {
 			appLogger.Notifyf(logging.ErrorLevel, "Failed to putScanFinding (scan failed), project_id: %d, err: %+v", *projectID, putErr)
@@ -89,11 +123,11 @@ func (f *Finalizer) Final(ctx context.Context, projectID *uint32, datasource Dat
 	// Scan succeeded
 	if putErr := f.putScanFinding(ctx, projectID, &ScanFinding{
 		ProjectID:  *projectID,
-		DataSource: datasource.DataSource(),
+		DataSource: f.datasource,
 		Status:     "OK",
-		Recommend: recommend{
-			Risk:           datasource.ScanFailureRisk(),
-			Recommendation: datasource.ScanFailureRecommend(),
+		Recommendation: &DataSourceRecommnend{
+			ScanFailureRisk:           f.recommendation.ScanFailureRisk,
+			ScanFailureRecommendation: f.recommendation.ScanFailureRecommendation,
 		},
 	}); putErr != nil {
 		appLogger.Notifyf(logging.ErrorLevel, "Failed to putScanFinding (scan succeeded), project_id: %d, err: %+v", *projectID, putErr)
@@ -103,11 +137,11 @@ func (f *Finalizer) Final(ctx context.Context, projectID *uint32, datasource Dat
 }
 
 type ScanFinding struct {
-	ProjectID    uint32    `json:"project_id,omitempty"`
-	DataSource   string    `json:"data_source,omitempty"`
-	Status       string    `json:"status,omitempty"`
-	ErrorMessage string    `json:"error_message,omitempty"`
-	Recommend    recommend `json:"recommend,omitempty"`
+	ProjectID      uint32                `json:"project_id,omitempty"`
+	DataSource     string                `json:"data_source,omitempty"`
+	Status         string                `json:"status,omitempty"`
+	ErrorMessage   string                `json:"error_message,omitempty"`
+	Recommendation *DataSourceRecommnend `json:"recommendation,omitempty"`
 }
 
 func (f *Finalizer) putScanFinding(ctx context.Context, projectID *uint32, sf *ScanFinding) error {
@@ -146,8 +180,8 @@ func (f *Finalizer) putScanFinding(ctx context.Context, projectID *uint32, sf *S
 		FindingId:      resp.Finding.FindingId,
 		DataSource:     "RISKEN",
 		Type:           fmt.Sprintf("ScanError/%s", sf.DataSource),
-		Risk:           sf.Recommend.Risk,
-		Recommendation: sf.Recommend.Recommendation,
+		Risk:           sf.Recommendation.ScanFailureRisk,
+		Recommendation: sf.Recommendation.ScanFailureRecommendation,
 	}); err != nil {
 		return fmt.Errorf("Failed to put scan finding recommned, finding_id=%d, error=%+v", resp.Finding.FindingId, err)
 	}

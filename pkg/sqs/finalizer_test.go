@@ -3,6 +3,8 @@ package sqs
 import (
 	"context"
 	"errors"
+	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/ca-risken/core/proto/finding"
@@ -11,14 +13,94 @@ import (
 )
 
 var (
-	sampleProjectID uint32 = 1
+	sampleProjectID  uint32 = 1
+	sampleDataSource string = "namespace:datasource"
+	sampleSettingURL string = "https://docs.security-hub.jp/"
 )
+
+func TestGenerateRecommendation(t *testing.T) {
+	type args struct {
+		datasource string
+		settingURL string
+		override   *DataSourceRecommnend
+	}
+	cases := []struct {
+		name    string
+		input   args
+		want    *DataSourceRecommnend
+		wantErr bool
+	}{
+		{
+			name: "OK",
+			input: args{
+				datasource: sampleDataSource,
+				settingURL: sampleSettingURL,
+				override:   nil,
+			},
+			want: &DataSourceRecommnend{
+				ScanFailureRisk: "Failed to scan namespace:datasource, So you are not gathering the latest security threat information.",
+				ScanFailureRecommendation: `Please review the following items and rescan,
+	- Ensure the error message of the DataSource.
+	- Ensure the access rights you set for the DataSource and the reachability of the network.
+	- Refer to the documentation to make sure you have not omitted any of the steps you have set up.
+	- https://docs.security-hub.jp/
+	- If this does not resolve the problem, or if you suspect that the problem is server-side, please contact the system administrators.`,
+			},
+		},
+		{
+			name: "OK Override",
+			input: args{
+				datasource: sampleDataSource,
+				settingURL: "",
+				override: &DataSourceRecommnend{
+					ScanFailureRisk:           "overriden risk",
+					ScanFailureRecommendation: "overriden recommendation",
+				},
+			},
+			want: &DataSourceRecommnend{
+				ScanFailureRisk:           "overriden risk",
+				ScanFailureRecommendation: "overriden recommendation",
+			},
+		},
+		{
+			name: "NG required datasource",
+			input: args{
+				datasource: "",
+				settingURL: sampleSettingURL,
+				override:   nil,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "NG required settingURL",
+			input: args{
+				datasource: sampleDataSource,
+				settingURL: "",
+				override:   nil,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got, err := generateRecommendation(c.input.datasource, c.input.settingURL, c.input.override)
+			if (c.wantErr && err == nil) || (!c.wantErr && err != nil) {
+				t.Fatalf("Unexpected error: wantErr=%t, err=%+v", c.wantErr, err)
+			}
+			if !reflect.DeepEqual(c.want, got) {
+				t.Fatalf("Unexpected data match: want=%+v, got=%+v", c.want, got)
+			}
+		})
+	}
+
+}
 
 func TestFinal(t *testing.T) {
 	type args struct {
-		ProjectID  *uint32
-		DataSource DataSourceRecommnend
-		Err        error
+		ProjectID *uint32
+		Err       error
 	}
 	mockClient := mocks.FindingServiceClient{}
 	type mockResponse struct {
@@ -37,9 +119,8 @@ func TestFinal(t *testing.T) {
 		{
 			name: "OK(no scan error)",
 			input: args{
-				ProjectID:  &sampleProjectID,
-				DataSource: &sampleDataSourceRecommend{},
-				Err:        nil,
+				ProjectID: &sampleProjectID,
+				Err:       nil,
 			},
 			mockResp: mockResponse{
 				PutFindingResp:   &finding.PutFindingResponse{Finding: &finding.Finding{FindingId: 1}},
@@ -52,9 +133,8 @@ func TestFinal(t *testing.T) {
 		{
 			name: "OK(exists scan error)",
 			input: args{
-				ProjectID:  &sampleProjectID,
-				DataSource: &sampleDataSourceRecommend{},
-				Err:        errors.New("Failed to scan"),
+				ProjectID: &sampleProjectID,
+				Err:       errors.New("Failed to scan"),
 			},
 			mockResp: mockResponse{
 				PutFindingResp:   &finding.PutFindingResponse{Finding: &finding.Finding{FindingId: 1}},
@@ -67,9 +147,8 @@ func TestFinal(t *testing.T) {
 		{
 			name: "ProjectID is nil(error)",
 			input: args{
-				ProjectID:  nil,
-				DataSource: &sampleDataSourceRecommend{},
-				Err:        errors.New("Failed to scan"),
+				ProjectID: nil,
+				Err:       errors.New("Failed to scan"),
 			},
 			mockResp: mockResponse{},
 			wantErr:  true,
@@ -77,9 +156,8 @@ func TestFinal(t *testing.T) {
 		{
 			name: "ProjectID is nil(no error)",
 			input: args{
-				ProjectID:  nil,
-				DataSource: &sampleDataSourceRecommend{},
-				Err:        nil,
+				ProjectID: nil,
+				Err:       nil,
 			},
 			mockResp: mockResponse{},
 			wantErr:  false,
@@ -87,9 +165,8 @@ func TestFinal(t *testing.T) {
 		{
 			name: "Failed to PutFinding API",
 			input: args{
-				ProjectID:  &sampleProjectID,
-				DataSource: &sampleDataSourceRecommend{},
-				Err:        nil,
+				ProjectID: &sampleProjectID,
+				Err:       nil,
 			},
 			mockResp: mockResponse{
 				PutFindingResp:   nil,
@@ -102,9 +179,8 @@ func TestFinal(t *testing.T) {
 		{
 			name: "Failed to PutRecommend API",
 			input: args{
-				ProjectID:  &sampleProjectID,
-				DataSource: &sampleDataSourceRecommend{},
-				Err:        nil,
+				ProjectID: &sampleProjectID,
+				Err:       nil,
 			},
 			mockResp: mockResponse{
 				PutFindingResp:   &finding.PutFindingResponse{Finding: &finding.Finding{FindingId: 1}},
@@ -118,7 +194,14 @@ func TestFinal(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			// setting mock client
-			f := Finalizer{findingClient: &mockClient}
+			f := Finalizer{
+				datasource: sampleDataSource,
+				recommendation: &DataSourceRecommnend{
+					ScanFailureRisk:           fmt.Sprintf(scanFailureRiskTemplate, sampleDataSource),
+					ScanFailureRecommendation: fmt.Sprintf(scanFailureRecommendTemplate, sampleSettingURL),
+				},
+				findingClient: &mockClient,
+			}
 			if c.mockResp.PutFindingResp != nil || c.mockResp.PutFindingErr != nil {
 				mockClient.On("PutFinding", mock.Anything, mock.Anything).Return(
 					c.mockResp.PutFindingResp, c.mockResp.PutFindingErr).Once()
@@ -130,7 +213,7 @@ func TestFinal(t *testing.T) {
 
 			// exec function
 			ctx := context.Background()
-			err := f.Final(ctx, c.input.ProjectID, c.input.DataSource, c.input.Err)
+			err := f.Final(ctx, c.input.ProjectID, c.input.Err)
 			if err == nil && c.wantErr {
 				t.Fatalf("Unexpected no error: wantErr=%t", c.wantErr)
 			}
@@ -139,18 +222,4 @@ func TestFinal(t *testing.T) {
 			}
 		})
 	}
-}
-
-type sampleDataSourceRecommend struct{}
-
-func (s *sampleDataSourceRecommend) DataSource() string {
-	return "namespace:datasource"
-}
-
-func (s *sampleDataSourceRecommend) ScanFailureRisk() string {
-	return "Failed to scan, So you are not gathering the latest security threat information."
-}
-
-func (s *sampleDataSourceRecommend) ScanFailureRecommend() string {
-	return "Please review the following items and rescan, ...."
 }
