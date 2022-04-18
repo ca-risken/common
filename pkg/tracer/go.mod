@@ -1,13 +1,8 @@
-module github.com/ca-risken/common/pkg/database
+module github.com/ca-risken/common/pkg/tracer
 
-go 1.17
+go 1.18
 
-require (
-	github.com/go-sql-driver/mysql v1.6.0
-	gopkg.in/DataDog/dd-trace-go.v1 v1.37.1
-	gorm.io/driver/mysql v1.1.1
-	gorm.io/gorm v1.21.12
-)
+require gopkg.in/DataDog/dd-trace-go.v1 v1.37.1
 
 require (
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.0.0-20211129110424-6491aa3bf583 // indirect
@@ -20,8 +15,6 @@ require (
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.3 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/philhofer/fwd v1.1.1 // indirect
