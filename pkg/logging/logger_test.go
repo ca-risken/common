@@ -2,8 +2,11 @@ package logging
 
 import (
 	"bytes"
+	"context"
 	"strings"
 	"testing"
+
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 func TestGenerateRequestID(t *testing.T) {
@@ -52,14 +55,22 @@ func TestGenerateRequestID(t *testing.T) {
 
 func TestDebug(t *testing.T) {
 	cases := []struct {
-		name  string
-		input string
-		want  []string
+		name    string
+		input   string
+		traceOn bool
+		want    []string
 	}{
 		{
-			name:  "OK",
-			input: "something",
-			want:  []string{"something", "debug"},
+			name:    "OK",
+			input:   "something",
+			traceOn: false,
+			want:    []string{"something", "debug"},
+		},
+		{
+			name:    "OK trace",
+			input:   "something",
+			traceOn: true,
+			want:    []string{"something", "debug", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -68,7 +79,13 @@ func TestDebug(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.Debug(c.input)
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.Debug(ctx, c.input)
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -81,14 +98,22 @@ func TestDebug(t *testing.T) {
 
 func TestDebugf(t *testing.T) {
 	cases := []struct {
-		name  string
-		input string
-		want  []string
+		name    string
+		input   string
+		traceOn bool
+		want    []string
 	}{
 		{
-			name:  "OK",
-			input: "something",
-			want:  []string{"something", "debug"},
+			name:    "OK",
+			input:   "something",
+			traceOn: false,
+			want:    []string{"something", "debug"},
+		},
+		{
+			name:    "OK trace",
+			input:   "something",
+			traceOn: true,
+			want:    []string{"something", "debug", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -97,7 +122,13 @@ func TestDebugf(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.Debugf("%s", c.input)
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.Debugf(ctx, "%s", c.input)
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -110,14 +141,22 @@ func TestDebugf(t *testing.T) {
 
 func TestInfo(t *testing.T) {
 	cases := []struct {
-		name  string
-		input string
-		want  []string
+		name    string
+		input   string
+		traceOn bool
+		want    []string
 	}{
 		{
-			name:  "OK",
-			input: "something",
-			want:  []string{"something", "info"},
+			name:    "OK",
+			input:   "something",
+			traceOn: false,
+			want:    []string{"something", "info"},
+		},
+		{
+			name:    "OK trace",
+			input:   "something",
+			traceOn: true,
+			want:    []string{"something", "info", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -126,7 +165,13 @@ func TestInfo(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.Info(c.input)
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.Info(ctx, c.input)
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -139,14 +184,22 @@ func TestInfo(t *testing.T) {
 
 func TestInfof(t *testing.T) {
 	cases := []struct {
-		name  string
-		input string
-		want  []string
+		name    string
+		input   string
+		traceOn bool
+		want    []string
 	}{
 		{
-			name:  "OK",
-			input: "something",
-			want:  []string{"something", "info"},
+			name:    "OK",
+			input:   "something",
+			traceOn: false,
+			want:    []string{"something", "info"},
+		},
+		{
+			name:    "OK trace",
+			input:   "something",
+			traceOn: true,
+			want:    []string{"something", "info", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -155,7 +208,13 @@ func TestInfof(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.Infof("%s", c.input)
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.Infof(ctx, "%s", c.input)
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -168,14 +227,22 @@ func TestInfof(t *testing.T) {
 
 func TestWarn(t *testing.T) {
 	cases := []struct {
-		name  string
-		input string
-		want  []string
+		name    string
+		input   string
+		traceOn bool
+		want    []string
 	}{
 		{
-			name:  "OK",
-			input: "something",
-			want:  []string{"something", "warning"},
+			name:    "OK",
+			input:   "something",
+			traceOn: false,
+			want:    []string{"something", "warning"},
+		},
+		{
+			name:    "OK trace",
+			input:   "something",
+			traceOn: true,
+			want:    []string{"something", "warning", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -184,7 +251,13 @@ func TestWarn(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.Warn(c.input)
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.Warn(ctx, c.input)
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -197,14 +270,22 @@ func TestWarn(t *testing.T) {
 
 func TestWarnf(t *testing.T) {
 	cases := []struct {
-		name  string
-		input string
-		want  []string
+		name    string
+		input   string
+		traceOn bool
+		want    []string
 	}{
 		{
-			name:  "OK",
-			input: "something",
-			want:  []string{"something", "warning"},
+			name:    "OK",
+			input:   "something",
+			traceOn: false,
+			want:    []string{"something", "warning"},
+		},
+		{
+			name:    "OK trace",
+			input:   "something",
+			traceOn: true,
+			want:    []string{"something", "warning", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -213,65 +294,13 @@ func TestWarnf(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.Warnf("%s", c.input)
-			logged := buf.String()
-			for _, key := range c.want {
-				if !strings.Contains(logged, key) {
-					t.Fatalf("Unexpected log: want(keyword)=%s, got=%s", key, logged)
-				}
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
 			}
-		})
-	}
-}
-
-func TestWarning(t *testing.T) {
-	cases := []struct {
-		name  string
-		input string
-		want  []string
-	}{
-		{
-			name:  "OK",
-			input: "something",
-			want:  []string{"something", "warning"},
-		},
-	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			buf := new(bytes.Buffer)
-			logger := NewLogger()
-			logger.Output(buf)
-			logger.Level(DebugLevel)
-			logger.Warning(c.input)
-			logged := buf.String()
-			for _, key := range c.want {
-				if !strings.Contains(logged, key) {
-					t.Fatalf("Unexpected log: want(keyword)=%s, got=%s", key, logged)
-				}
-			}
-		})
-	}
-}
-
-func TestWarningf(t *testing.T) {
-	cases := []struct {
-		name  string
-		input string
-		want  []string
-	}{
-		{
-			name:  "OK",
-			input: "something",
-			want:  []string{"something", "warning"},
-		},
-	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			buf := new(bytes.Buffer)
-			logger := NewLogger()
-			logger.Output(buf)
-			logger.Level(DebugLevel)
-			logger.Warningf("%s", c.input)
+			logger.Warnf(ctx, "%s", c.input)
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -284,14 +313,22 @@ func TestWarningf(t *testing.T) {
 
 func TestError(t *testing.T) {
 	cases := []struct {
-		name  string
-		input string
-		want  []string
+		name    string
+		input   string
+		traceOn bool
+		want    []string
 	}{
 		{
-			name:  "OK",
-			input: "something",
-			want:  []string{"something", "error"},
+			name:    "OK",
+			input:   "something",
+			traceOn: false,
+			want:    []string{"something", "error"},
+		},
+		{
+			name:    "OK trace",
+			input:   "something",
+			traceOn: true,
+			want:    []string{"something", "error", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -300,7 +337,13 @@ func TestError(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.Error(c.input)
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.Error(ctx, c.input)
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -313,14 +356,22 @@ func TestError(t *testing.T) {
 
 func TestErrorf(t *testing.T) {
 	cases := []struct {
-		name  string
-		input string
-		want  []string
+		name    string
+		input   string
+		traceOn bool
+		want    []string
 	}{
 		{
-			name:  "OK",
-			input: "something",
-			want:  []string{"something", "error"},
+			name:    "OK",
+			input:   "something",
+			traceOn: false,
+			want:    []string{"something", "error"},
+		},
+		{
+			name:    "OK trace",
+			input:   "something",
+			traceOn: true,
+			want:    []string{"something", "error", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -329,7 +380,13 @@ func TestErrorf(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.Errorf("%s", c.input)
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.Errorf(ctx, "%s", c.input)
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -345,19 +402,29 @@ func TestNotify(t *testing.T) {
 		name       string
 		input      string
 		inputLevel Level
+		traceOn    bool
 		want       []string
 	}{
 		{
 			name:       "OK",
 			input:      "something",
 			inputLevel: InfoLevel,
+			traceOn:    false,
 			want:       []string{"something", "info", notifyKey, "true"},
 		},
 		{
 			name:       "OK debug",
 			input:      "something",
 			inputLevel: DebugLevel,
+			traceOn:    false,
 			want:       []string{"something", "debug", notifyKey, "true"},
+		},
+		{
+			name:       "OK trace",
+			input:      "something",
+			inputLevel: InfoLevel,
+			traceOn:    true,
+			want:       []string{"something", "info", notifyKey, "true", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -366,7 +433,13 @@ func TestNotify(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.Notify(c.inputLevel, c.input)
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.Notify(ctx, c.inputLevel, c.input)
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -382,19 +455,29 @@ func TestNotifyf(t *testing.T) {
 		name       string
 		input      string
 		inputLevel Level
+		traceOn    bool
 		want       []string
 	}{
 		{
 			name:       "OK",
 			input:      "something",
 			inputLevel: InfoLevel,
+			traceOn:    false,
 			want:       []string{"something", "info", notifyKey, "true"},
 		},
 		{
 			name:       "OK debug",
 			input:      "something",
 			inputLevel: DebugLevel,
+			traceOn:    false,
 			want:       []string{"something", "debug", notifyKey, "true"},
+		},
+		{
+			name:       "OK trace",
+			input:      "something",
+			inputLevel: InfoLevel,
+			traceOn:    true,
+			want:       []string{"something", "info", notifyKey, "true", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -403,7 +486,13 @@ func TestNotifyf(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.Notifyf(c.inputLevel, "%s", c.input)
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.Notifyf(ctx, c.inputLevel, "%s", c.input)
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -418,6 +507,7 @@ func TestWithItems(t *testing.T) {
 		name       string
 		input      map[string]interface{}
 		inputLevel Level
+		traceOn    bool
 		want       []string
 	}{
 		{
@@ -426,6 +516,7 @@ func TestWithItems(t *testing.T) {
 				"key1": "value1",
 			},
 			inputLevel: InfoLevel,
+			traceOn:    false,
 			want:       []string{"info", "key1", "value1"},
 		},
 		{
@@ -435,7 +526,17 @@ func TestWithItems(t *testing.T) {
 				"key2": "value2",
 			},
 			inputLevel: DebugLevel,
+			traceOn:    false,
 			want:       []string{"debug", "key1", "value1", "key2", "value2"},
+		},
+		{
+			name: "OK trace",
+			input: map[string]interface{}{
+				"key1": "value1",
+			},
+			inputLevel: InfoLevel,
+			traceOn:    true,
+			want:       []string{"info", "key1", "value1", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -444,7 +545,13 @@ func TestWithItems(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.WithItems(c.inputLevel, c.input, "test")
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.WithItems(ctx, c.inputLevel, c.input, "test")
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {
@@ -460,6 +567,7 @@ func TestWithItemsf(t *testing.T) {
 		name       string
 		input      map[string]interface{}
 		inputLevel Level
+		traceOn    bool
 		want       []string
 	}{
 		{
@@ -468,6 +576,7 @@ func TestWithItemsf(t *testing.T) {
 				"key1": "value1",
 			},
 			inputLevel: InfoLevel,
+			traceOn:    false,
 			want:       []string{"info", "key1", "value1"},
 		},
 		{
@@ -477,7 +586,17 @@ func TestWithItemsf(t *testing.T) {
 				"key2": "value2",
 			},
 			inputLevel: DebugLevel,
+			traceOn:    false,
 			want:       []string{"debug", "key1", "value1", "key2", "value2"},
+		},
+		{
+			name: "OK trace",
+			input: map[string]interface{}{
+				"key1": "value1",
+			},
+			inputLevel: InfoLevel,
+			traceOn:    true,
+			want:       []string{"info", "key1", "value1", "dd.trace_id", "dd.span_id"},
 		},
 	}
 	for _, c := range cases {
@@ -486,7 +605,13 @@ func TestWithItemsf(t *testing.T) {
 			logger := NewLogger()
 			logger.Output(buf)
 			logger.Level(DebugLevel)
-			logger.WithItemsf(c.inputLevel, c.input, "%s", "test")
+			ctx := context.Background()
+			if c.traceOn {
+				span := tracer.StartSpan("test span")
+				defer span.Finish()
+				ctx = tracer.ContextWithSpan(ctx, span)
+			}
+			logger.WithItemsf(ctx, c.inputLevel, c.input, "%s", "test")
 			logged := buf.String()
 			for _, key := range c.want {
 				if !strings.Contains(logged, key) {

@@ -1,12 +1,14 @@
 package logging
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 // Level type
@@ -31,33 +33,35 @@ const (
 	DebugLevel
 	// TraceLevel level. Designates finer-grained informational events than the Debug.
 	TraceLevel
+
+	notifyKey  = "notify"
+	traceIDKey = "dd.trace_id"
+	spanIDKey  = "dd.span_id"
 )
 
 // Logger interface
 type Logger interface {
-	Debugf(format string, args ...interface{})
-	Infof(format string, args ...interface{})
-	Warnf(format string, args ...interface{})
-	Warningf(format string, args ...interface{})
-	Errorf(format string, args ...interface{})
-	Fatalf(format string, args ...interface{})
-	Panicf(format string, args ...interface{})
+	Debugf(ctx context.Context, format string, args ...interface{})
+	Infof(ctx context.Context, format string, args ...interface{})
+	Warnf(ctx context.Context, format string, args ...interface{})
+	Errorf(ctx context.Context, format string, args ...interface{})
+	Fatalf(ctx context.Context, format string, args ...interface{})
+	Panicf(ctx context.Context, format string, args ...interface{})
 
-	Debug(args ...interface{})
-	Info(args ...interface{})
-	Warn(args ...interface{})
-	Warning(args ...interface{})
-	Error(args ...interface{})
-	Fatal(args ...interface{})
-	Panic(args ...interface{})
+	Debug(ctx context.Context, args ...interface{})
+	Info(ctx context.Context, args ...interface{})
+	Warn(ctx context.Context, args ...interface{})
+	Error(ctx context.Context, args ...interface{})
+	Fatal(ctx context.Context, args ...interface{})
+	Panic(ctx context.Context, args ...interface{})
 
 	Level(level Level)
 	Output(w io.Writer)
 	GenerateRequestID(prefix string) (string, error)
-	Notify(level Level, args ...interface{})
-	Notifyf(level Level, format string, args ...interface{})
-	WithItems(level Level, fields map[string]interface{}, args ...interface{})
-	WithItemsf(level Level, fields map[string]interface{}, format string, args ...interface{})
+	Notify(ctx context.Context, level Level, args ...interface{})
+	Notifyf(ctx context.Context, level Level, format string, args ...interface{})
+	WithItems(ctx context.Context, level Level, fields map[string]interface{}, args ...interface{})
+	WithItemsf(ctx context.Context, level Level, fields map[string]interface{}, format string, args ...interface{})
 }
 
 type AppLogger struct {
@@ -72,62 +76,54 @@ func NewLogger() Logger {
 	return &AppLogger{l}
 }
 
-func (a *AppLogger) Debugf(format string, args ...interface{}) {
-	a.Logf(logrus.DebugLevel, format, args...)
+func (a *AppLogger) Debugf(ctx context.Context, format string, args ...interface{}) {
+	a.logWithTracef(ctx, DebugLevel, nil, format, args...)
 }
 
-func (a *AppLogger) Infof(format string, args ...interface{}) {
-	a.Logf(logrus.InfoLevel, format, args...)
+func (a *AppLogger) Infof(ctx context.Context, format string, args ...interface{}) {
+	a.logWithTracef(ctx, InfoLevel, nil, format, args...)
 }
 
-func (a *AppLogger) Warnf(format string, args ...interface{}) {
-	a.Logf(logrus.WarnLevel, format, args...)
+func (a *AppLogger) Warnf(ctx context.Context, format string, args ...interface{}) {
+	a.logWithTracef(ctx, WarnLevel, nil, format, args...)
 }
 
-func (a *AppLogger) Warningf(format string, args ...interface{}) {
-	a.Warnf(format, args...)
+func (a *AppLogger) Errorf(ctx context.Context, format string, args ...interface{}) {
+	a.logWithTracef(ctx, ErrorLevel, nil, format, args...)
 }
 
-func (a *AppLogger) Errorf(format string, args ...interface{}) {
-	a.Logf(logrus.ErrorLevel, format, args...)
-}
-
-func (a *AppLogger) Fatalf(format string, args ...interface{}) {
-	a.Logf(logrus.FatalLevel, format, args...)
+func (a *AppLogger) Fatalf(ctx context.Context, format string, args ...interface{}) {
+	a.logWithTracef(ctx, FatalLevel, nil, format, args...)
 	a.Exit(1)
 }
 
-func (a *AppLogger) Panicf(format string, args ...interface{}) {
-	a.Logf(logrus.PanicLevel, format, args...)
+func (a *AppLogger) Panicf(ctx context.Context, format string, args ...interface{}) {
+	a.logWithTracef(ctx, PanicLevel, nil, format, args...)
 }
 
-func (a *AppLogger) Debug(args ...interface{}) {
-	a.Log(logrus.DebugLevel, args...)
+func (a *AppLogger) Debug(ctx context.Context, args ...interface{}) {
+	a.logWithTrace(ctx, DebugLevel, nil, args...)
 }
 
-func (a *AppLogger) Info(args ...interface{}) {
-	a.Log(logrus.InfoLevel, args...)
+func (a *AppLogger) Info(ctx context.Context, args ...interface{}) {
+	a.logWithTrace(ctx, InfoLevel, nil, args...)
 }
 
-func (a *AppLogger) Warn(args ...interface{}) {
-	a.Log(logrus.WarnLevel, args...)
+func (a *AppLogger) Warn(ctx context.Context, args ...interface{}) {
+	a.logWithTrace(ctx, WarnLevel, nil, args...)
 }
 
-func (a *AppLogger) Warning(args ...interface{}) {
-	a.Warn(args...)
+func (a *AppLogger) Error(ctx context.Context, args ...interface{}) {
+	a.logWithTrace(ctx, ErrorLevel, nil, args...)
 }
 
-func (a *AppLogger) Error(args ...interface{}) {
-	a.Log(logrus.ErrorLevel, args...)
-}
-
-func (a *AppLogger) Fatal(args ...interface{}) {
-	a.Log(logrus.FatalLevel, args...)
+func (a *AppLogger) Fatal(ctx context.Context, args ...interface{}) {
+	a.logWithTrace(ctx, FatalLevel, nil, args...)
 	a.Exit(1)
 }
 
-func (a *AppLogger) Panic(args ...interface{}) {
-	a.Log(logrus.PanicLevel, args...)
+func (a *AppLogger) Panic(ctx context.Context, args ...interface{}) {
+	a.logWithTrace(ctx, PanicLevel, nil, args...)
 }
 
 func parseLogrusLevel(l Level) logrus.Level {
@@ -167,34 +163,46 @@ func (a *AppLogger) GenerateRequestID(prefix string) (string, error) {
 	return fmt.Sprintf("%s-%s", prefix, u.String()), nil
 }
 
-const (
-	notifyKey = "notify"
-)
-
-func (a *AppLogger) Notify(level Level, args ...interface{}) {
-	a.WithFields(logrus.Fields{
-		"notify": true,
-	}).Log(parseLogrusLevel(level), args...)
+func (a *AppLogger) Notify(ctx context.Context, level Level, args ...interface{}) {
+	m := map[string]interface{}{notifyKey: true}
+	a.logWithTrace(ctx, level, m, args...)
 }
 
-func (a *AppLogger) Notifyf(level Level, format string, args ...interface{}) {
-	a.WithFields(logrus.Fields{
-		"notify": true,
-	}).Logf(parseLogrusLevel(level), format, args...)
+func (a *AppLogger) Notifyf(ctx context.Context, level Level, format string, args ...interface{}) {
+	m := map[string]interface{}{notifyKey: true}
+	a.logWithTracef(ctx, level, m, format, args...)
 }
 
-func (a *AppLogger) WithItems(level Level, fields map[string]interface{}, args ...interface{}) {
+func (a *AppLogger) WithItems(ctx context.Context, level Level, fields map[string]interface{}, args ...interface{}) {
+	a.logWithTrace(ctx, level, fields, args...)
+}
+
+func (a *AppLogger) WithItemsf(ctx context.Context, level Level, fields map[string]interface{}, format string, args ...interface{}) {
+	a.logWithTracef(ctx, level, fields, format, args...)
+}
+
+func (a *AppLogger) logWithTracef(ctx context.Context, level Level, fields map[string]interface{}, format string, args ...interface{}) {
 	f := logrus.Fields{}
 	for k, v := range fields {
 		f[k] = v
 	}
-	a.WithFields(f).Log(parseLogrusLevel(level), args...)
-}
-
-func (a *AppLogger) WithItemsf(level Level, fields map[string]interface{}, format string, args ...interface{}) {
-	f := logrus.Fields{}
-	for k, v := range fields {
-		f[k] = v
+	span, ok := tracer.SpanFromContext(ctx)
+	if ok {
+		f[traceIDKey] = span.Context().TraceID()
+		f[spanIDKey] = span.Context().SpanID()
 	}
 	a.WithFields(f).Logf(parseLogrusLevel(level), format, args...)
+}
+
+func (a *AppLogger) logWithTrace(ctx context.Context, level Level, fields map[string]interface{}, args ...interface{}) {
+	f := logrus.Fields{}
+	for k, v := range fields {
+		f[k] = v
+	}
+	span, ok := tracer.SpanFromContext(ctx)
+	if ok {
+		f[traceIDKey] = span.Context().TraceID()
+		f[spanIDKey] = span.Context().SpanID()
+	}
+	a.WithFields(f).Log(parseLogrusLevel(level), args...)
 }
