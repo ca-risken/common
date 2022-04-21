@@ -9,6 +9,7 @@ import (
 	awssqs "github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/ca-risken/common/pkg/logging"
 	"github.com/gassara-kys/go-sqs-poller/worker/v4"
+	ddtracer "gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 // Handler is common interface for handling sqs message in the risken.
@@ -69,5 +70,16 @@ func RetryableErrorHandler(h Handler) Handler {
 			return err
 		}
 		return nil
+	})
+}
+
+func TracingHandler(serviceName string, h Handler) Handler {
+	return HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
+		span, tctx := ddtracer.StartSpanFromContext(ctx, serviceName)
+		// TODO inherit trace from message
+		defer span.Finish()
+
+		err := h.HandleMessage(tctx, msg)
+		return err
 	})
 }
