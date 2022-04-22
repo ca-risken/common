@@ -7,6 +7,7 @@ import (
 
 	awssqs "github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/stretchr/testify/assert"
+	ddtracer "gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 func TestRetryableErrorHandler(t *testing.T) {
@@ -28,4 +29,14 @@ func TestRetryableErrorHandler(t *testing.T) {
 	})
 	actual = RetryableErrorHandler(nonRetryableErrorCase).HandleMessage(context.Background(), nil)
 	assert.Nil(t, actual)
+}
+
+func TestTracingHandler(t *testing.T) {
+	startTraceCase := HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
+		_, ok := ddtracer.SpanFromContext(ctx)
+		assert.True(t, ok)
+		return nil
+	})
+	actual := TracingHandler("test", startTraceCase).HandleMessage(context.Background(), nil)
+	assert.NoError(t, actual)
 }
