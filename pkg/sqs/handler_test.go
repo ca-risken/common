@@ -32,11 +32,22 @@ func TestRetryableErrorHandler(t *testing.T) {
 }
 
 func TestTracingHandler(t *testing.T) {
+	var tctx context.Context
 	startTraceCase := HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
-		_, ok := ddtracer.SpanFromContext(ctx)
-		assert.True(t, ok)
+		tctx = ctx
 		return nil
 	})
 	actual := TracingHandler("test", startTraceCase).HandleMessage(context.Background(), nil)
 	assert.NoError(t, actual)
+	_, ok := ddtracer.SpanFromContext(tctx)
+	assert.True(t, ok)
+
+	errorCase := HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
+		tctx = ctx
+		return fmt.Errorf("some error")
+	})
+	actual = TracingHandler("test", errorCase).HandleMessage(context.Background(), nil)
+	assert.Error(t, actual)
+	_, ok = ddtracer.SpanFromContext(tctx)
+	assert.True(t, ok)
 }

@@ -77,9 +77,8 @@ func TracingHandler(serviceName string, h Handler) Handler {
 	return HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
 		span, tctx := ddtracer.StartSpanFromContext(ctx, serviceName)
 		// TODO inherit trace from message
-		defer span.Finish()
-
 		err := h.HandleMessage(tctx, msg)
+		span.Finish(ddtracer.WithError(err))
 		return err
 	})
 }
