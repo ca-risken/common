@@ -53,9 +53,9 @@ func StatusLoggingHandler(logger logging.Logger, h Handler) Handler {
 			"elapsed": elapsed,
 		}
 		if err != nil {
-			logger.WithItemsf(ctx, logging.WarnLevel, items, "handling message failed. err: %+v", err)
+			logger.WithItemsf(logging.WarnLevel, items, "handling message failed. err: %+v", err)
 		} else {
-			logger.WithItems(ctx, logging.InfoLevel, items, "handling message succeeded.")
+			logger.WithItems(logging.InfoLevel, items, "handling message succeeded.")
 		}
 		return err
 	})

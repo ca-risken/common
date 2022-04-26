@@ -76,7 +76,7 @@ func (f *Finalizer) FinalizeHandler(next Handler) Handler {
 		err := next.HandleMessage(ctx, sqsMsg)
 		projectID, parseErr := parseProjectFromMessage(aws.StringValue(sqsMsg.Body))
 		if parseErr != nil {
-			appLogger.Errorf(ctx, "Invalid message(failed to get project_id): sqsMsg=%+v, err=%+v", sqsMsg, parseErr)
+			appLogger.Errorf("Invalid message(failed to get project_id): sqsMsg=%+v, err=%+v", sqsMsg, parseErr)
 			return f.Final(ctx, nil, err)
 		}
 		return f.Final(ctx, &projectID, err)
@@ -99,7 +99,7 @@ func parseProjectFromMessage(msg string) (uint32, error) {
 func (f *Finalizer) Final(ctx context.Context, projectID *uint32, err error) error {
 	if projectID == nil {
 		// Unknown project
-		appLogger.Notifyf(ctx, logging.ErrorLevel, "Unknown project, err: %+v", err)
+		appLogger.Notifyf(logging.ErrorLevel, "Unknown project, err: %+v", err)
 		return err
 	}
 	if err != nil {
@@ -114,7 +114,7 @@ func (f *Finalizer) Final(ctx context.Context, projectID *uint32, err error) err
 				ScanFailureRecommendation: f.recommendation.ScanFailureRecommendation,
 			},
 		}); putErr != nil {
-			appLogger.Notifyf(ctx, logging.ErrorLevel, "Failed to putScanFinding (scan failed), project_id: %d, err: %+v", *projectID, putErr)
+			appLogger.Notifyf(logging.ErrorLevel, "Failed to putScanFinding (scan failed), project_id: %d, err: %+v", *projectID, putErr)
 			return err
 		}
 		return err
@@ -130,7 +130,7 @@ func (f *Finalizer) Final(ctx context.Context, projectID *uint32, err error) err
 			ScanFailureRecommendation: f.recommendation.ScanFailureRecommendation,
 		},
 	}); putErr != nil {
-		appLogger.Notifyf(ctx, logging.ErrorLevel, "Failed to putScanFinding (scan succeeded), project_id: %d, err: %+v", *projectID, putErr)
+		appLogger.Notifyf(logging.ErrorLevel, "Failed to putScanFinding (scan succeeded), project_id: %d, err: %+v", *projectID, putErr)
 		return nil
 	}
 	return nil
