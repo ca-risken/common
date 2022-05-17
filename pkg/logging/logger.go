@@ -34,9 +34,9 @@ const (
 	// TraceLevel level. Designates finer-grained informational events than the Debug.
 	TraceLevel
 
-	notifyKey  = "notify"
-	traceIDKey = "dd.trace_id"
-	spanIDKey  = "dd.span_id"
+	notifyKey       = "notify"
+	FieldKeyTraceID = "dd.trace_id"
+	FieldKeySpanID  = "dd.span_id"
 )
 
 // Logger interface
@@ -188,8 +188,8 @@ func (a *AppLogger) logWithTracef(ctx context.Context, level Level, fields map[s
 	}
 	span, ok := tracer.SpanFromContext(ctx)
 	if ok {
-		f[traceIDKey] = span.Context().TraceID()
-		f[spanIDKey] = span.Context().SpanID()
+		f[FieldKeyTraceID] = span.Context().TraceID()
+		f[FieldKeySpanID] = span.Context().SpanID()
 	}
 	a.WithFields(f).Logf(parseLogrusLevel(level), format, args...)
 }
@@ -201,8 +201,8 @@ func (a *AppLogger) logWithTrace(ctx context.Context, level Level, fields map[st
 	}
 	span, ok := tracer.SpanFromContext(ctx)
 	if ok {
-		f[traceIDKey] = span.Context().TraceID()
-		f[spanIDKey] = span.Context().SpanID()
+		f[FieldKeyTraceID] = span.Context().TraceID()
+		f[FieldKeySpanID] = span.Context().SpanID()
 	}
 	a.WithFields(f).Log(parseLogrusLevel(level), args...)
 }
