@@ -24,7 +24,7 @@ func LoggingUnaryServerInterceptor(logger logging.Logger) grpc.UnaryServerInterc
 		if err != nil {
 			items["error"] = shorten(err.Error())
 		}
-		logger.WithItems(logging.InfoLevel, items, "receive from client")
+		logger.WithItems(ctx, logging.InfoLevel, items, "receive from client")
 		return res, err
 	}
 }
