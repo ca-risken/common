@@ -14,8 +14,8 @@ import (
 
 var (
 	sampleProjectID  uint32 = 1
-	sampleDataSource string = "namespace:datasource"
-	sampleSettingURL string = "https://docs.security-hub.jp/"
+	sampleDataSource        = "namespace:datasource"
+	sampleSettingURL        = "https://docs.security-hub.jp/"
 )
 
 func TestGenerateRecommendation(t *testing.T) {

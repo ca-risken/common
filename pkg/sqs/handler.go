@@ -6,20 +6,20 @@ import (
 	"fmt"
 	"time"
 
-	awssqs "github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/ca-risken/common/pkg/logging"
-	"github.com/gassara-kys/go-sqs-poller/worker/v4"
+	"github.com/ca-risken/go-sqs-poller/worker/v5"
 	ddtracer "gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 // Handler is common interface for handling sqs message in the risken.
 type Handler interface {
-	HandleMessage(ctx context.Context, msg *awssqs.Message) error
+	HandleMessage(ctx context.Context, msg *types.Message) error
 }
 
-type HandlerFunc func(ctx context.Context, msg *awssqs.Message) error
+type HandlerFunc func(ctx context.Context, msg *types.Message) error
 
-func (f HandlerFunc) HandleMessage(ctx context.Context, msg *awssqs.Message) error {
+func (f HandlerFunc) HandleMessage(ctx context.Context, msg *types.Message) error {
 	return f(ctx, msg)
 }
 
@@ -38,14 +38,14 @@ func (e NonRetryableError) Error() string {
 
 // InitializeHandler returns go-sqs-poller worker Handler from common Handler interface.
 func InitializeHandler(h Handler) worker.Handler {
-	return worker.HandlerFunc(func(msg *awssqs.Message) error {
+	return worker.HandlerFunc(func(msg *types.Message) error {
 		ctx := context.Background()
 		return h.HandleMessage(ctx, msg)
 	})
 }
 
 func StatusLoggingHandler(logger logging.Logger, h Handler) Handler {
-	return HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
+	return HandlerFunc(func(ctx context.Context, msg *types.Message) error {
 		now := time.Now()
 		err := h.HandleMessage(ctx, msg)
 		elapsed := time.Since(now).Seconds()
@@ -53,9 +53,9 @@ func StatusLoggingHandler(logger logging.Logger, h Handler) Handler {
 			"elapsed": elapsed,
 		}
 		if err != nil {
-			logger.WithItemsf(logging.WarnLevel, items, "handling message failed. err: %+v", err)
+			logger.WithItemsf(ctx, logging.WarnLevel, items, "handling message failed. err: %+v", err)
 		} else {
-			logger.WithItems(logging.InfoLevel, items, "handling message succeeded.")
+			logger.WithItems(ctx, logging.InfoLevel, items, "handling message succeeded.")
 		}
 		return err
 	})
@@ -63,7 +63,7 @@ func StatusLoggingHandler(logger logging.Logger, h Handler) Handler {
 
 // RetryableErrorHandler returns the Handler that returns nil when NonRetryableError occurred.
 func RetryableErrorHandler(h Handler) Handler {
-	return HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
+	return HandlerFunc(func(ctx context.Context, msg *types.Message) error {
 		err := h.HandleMessage(ctx, msg)
 		var target NonRetryableError
 		if err != nil && !errors.As(err, &target) {
@@ -74,7 +74,7 @@ func RetryableErrorHandler(h Handler) Handler {
 }
 
 func TracingHandler(serviceName string, h Handler) Handler {
-	return HandlerFunc(func(ctx context.Context, msg *awssqs.Message) error {
+	return HandlerFunc(func(ctx context.Context, msg *types.Message) error {
 		span, tctx := ddtracer.StartSpanFromContext(ctx, serviceName)
 		// TODO inherit trace from message
 		err := h.HandleMessage(tctx, msg)
