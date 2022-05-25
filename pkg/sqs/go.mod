@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.18.5
 	github.com/ca-risken/common/pkg/logging v0.0.0-20220518032134-ad443b601efd
 	github.com/ca-risken/core/proto/finding v0.0.0-20220309052852-c058b4e5cb84
-	github.com/ca-risken/go-sqs-poller/worker/v5 v5.0.0-20220502103103-3ea0e54c7692
+	github.com/ca-risken/go-sqs-poller/worker/v5 v5.0.0-20220525093235-9148d33b6aee
 	github.com/stretchr/testify v1.7.1
 	google.golang.org/grpc v1.45.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.38.0
