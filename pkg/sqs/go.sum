@@ -126,8 +126,8 @@ github.com/ca-risken/common/pkg/logging v0.0.0-20220518032134-ad443b601efd h1:YX
 github.com/ca-risken/common/pkg/logging v0.0.0-20220518032134-ad443b601efd/go.mod h1:iqLbvDuf708TWjF8RO5qw6Nx1e3R0/UEHZ8tE/VEPjA=
 github.com/ca-risken/core/proto/finding v0.0.0-20220309052852-c058b4e5cb84 h1:QcCZ9Zek8gwBYHlONiuW9DN6XvXyql1yUPGKiKtoeCw=
 github.com/ca-risken/core/proto/finding v0.0.0-20220309052852-c058b4e5cb84/go.mod h1:3KZ1YanhizuVyAqMnCG7sI8Rt2mTvsWfB1GieIvoGRI=
-github.com/ca-risken/go-sqs-poller/worker/v5 v5.0.0-20220502103103-3ea0e54c7692 h1:mLQXrqlr2Xb+KvtrQrQOuKpsbxdRDc3W31VjVqezMSk=
-github.com/ca-risken/go-sqs-poller/worker/v5 v5.0.0-20220502103103-3ea0e54c7692/go.mod h1:pboVfH7X3jKqsVKSpYNYAgqgPQ6gVb+AjFuWH1e8dSU=
+github.com/ca-risken/go-sqs-poller/worker/v5 v5.0.0-20220525093235-9148d33b6aee h1:aIrvjCnF+Owzzh7dnE1w4442CdcuUkHaJsJOXImjeqg=
+github.com/ca-risken/go-sqs-poller/worker/v5 v5.0.0-20220525093235-9148d33b6aee/go.mod h1:pboVfH7X3jKqsVKSpYNYAgqgPQ6gVb+AjFuWH1e8dSU=
 github.com/cenkalti/backoff/v3 v3.0.0/go.mod h1:cIeZDE3IrqwwJl6VUwCN6trj1oXrTS4rc0ij+ULvLYs=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
