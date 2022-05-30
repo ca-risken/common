@@ -47,7 +47,7 @@ func (n *NmapResult) GetFindings(projectID uint32, dataSource, data string) []*f
 
 func (n *NmapResult) GetTags() []string {
 	ret := []string{}
-	if n.Service != "unknown" {
+	if n.Service != "unknown" && n.Service != "" {
 		ret = append(ret, n.Service)
 	}
 	/*
