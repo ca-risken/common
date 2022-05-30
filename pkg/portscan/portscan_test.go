@@ -80,6 +80,13 @@ func TestGetTags(t *testing.T) {
 			},
 			tags: []string{"http"},
 		},
+		{
+			name: "empty tag is not returned",
+			nmapResult: &NmapResult{
+				Service: "",
+			},
+			tags: []string{},
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
