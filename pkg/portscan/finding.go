@@ -50,17 +50,6 @@ func (n *NmapResult) GetTags() []string {
 	if n.Service != "unknown" && n.Service != "" {
 		ret = append(ret, n.Service)
 	}
-	/*
-		for key, detail := range n.ScanDetail {
-			if _, ok := httpCheckResult[key]; !ok {
-				continue
-			}
-			if detail == true {
-				addResult := httpCheckResult[key]
-				ret = append(ret, addResult.Tag...)
-			}
-		}
-	*/
 	return ret
 }
 
