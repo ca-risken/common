@@ -381,7 +381,7 @@ func TestGetAdditionalCheck(t *testing.T) {
 		{
 			name: "AdditionalCheckResult is found.",
 			key:  "isHTTPOpenProxy",
-			expect: AdditionalCheckResult{Score: 0.8, Tag: []string{"http"}, Type: "isHTTPOpenProxy",
+			expect: AdditionalCheckResult{Score: 8.0, Tag: []string{"http"}, Type: "isHTTPOpenProxy",
 				Description: "{TARGET} is Potentially OPEN proxy. port: {PORT}",
 				Risk: `HTTP Open Proxies is Enabled.
 	- Malicious client can use an open proxy to launch an attack that originates from the proxy server's IP.`,
