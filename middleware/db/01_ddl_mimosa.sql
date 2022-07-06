@@ -489,6 +489,46 @@ CREATE TABLE code_enterprise_org (
   PRIMARY KEY(gitleaks_id, login)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
+CREATE TABLE code_github_setting (
+  code_github_setting_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT UNSIGNED NOT NULL,
+  name VARCHAR(64) NULL,
+  github_user VARCHAR(64) NULL,
+  personal_access_token VARCHAR(255) NULL,
+  type ENUM('UNKNOWN_TYPE', 'ENTERPRISE' ,'ORGANIZATION', 'USER') NOT NULL DEFAULT 'UNKNOWN_TYPE',
+  base_url VARCHAR(128) NULL,
+  target_resource VARCHAR(128) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(code_github_setting_id),
+  UNIQUE KEY uidx_code_github_setting (name, project_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE code_gitleaks_setting (
+  code_github_setting_id INT UNSIGNED NOT NULL,
+  project_id INT UNSIGNED NOT NULL,
+  code_data_source_id INT UNSIGNED NOT NULL,
+  repository_pattern VARCHAR(128) NULL,
+  scan_public ENUM('false', 'true') NOT NULL DEFAULT 'true',
+  scan_internal ENUM('false', 'true') NOT NULL DEFAULT 'true',
+  scan_private ENUM('false', 'true') NOT NULL DEFAULT 'false',
+  status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
+  status_detail VARCHAR(255) NULL,
+  scan_at DATETIME NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(code_github_setting_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE code_github_enterprise_org (
+  code_github_setting_id INT UNSIGNED NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  project_id INT UNSIGNED NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(code_github_setting_id, organization)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+
 -- GOOGLE ------------------------------------------------
 CREATE TABLE google_data_source (
   google_data_source_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
