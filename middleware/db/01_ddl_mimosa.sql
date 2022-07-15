@@ -122,7 +122,7 @@ CREATE TABLE finding_tag (
   INDEX idx_finding_tag(tag)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
-CREATE INDEX idx_project_id ON finding_tag (project_id);
+CREATE INDEX idx_project_id ON finding_tag (project_id, tag);
 
 CREATE TABLE resource (
   resource_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
