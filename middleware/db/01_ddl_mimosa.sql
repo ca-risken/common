@@ -520,6 +520,18 @@ CREATE TABLE code_gitleaks_setting (
   PRIMARY KEY(code_github_setting_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
+CREATE TABLE code_dependency_setting (
+  code_github_setting_id INT UNSIGNED NOT NULL,
+  project_id INT UNSIGNED NOT NULL,
+  code_data_source_id INT UNSIGNED NOT NULL,
+  status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
+  status_detail VARCHAR(255) NULL,
+  scan_at DATETIME NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(code_github_setting_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+
 CREATE TABLE code_github_enterprise_org (
   code_github_setting_id INT UNSIGNED NOT NULL,
   organization VARCHAR(128) NOT NULL,
