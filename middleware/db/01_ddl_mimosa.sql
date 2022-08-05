@@ -524,7 +524,7 @@ CREATE TABLE code_dependency_setting (
   code_github_setting_id INT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
   code_data_source_id INT UNSIGNED NOT NULL,
-  status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
+  status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL,
   status_detail VARCHAR(255) NULL,
   scan_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
