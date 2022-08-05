@@ -38,7 +38,8 @@ INSERT INTO diagnosis_data_source(diagnosis_data_source_id, name, description, m
 
 -- CODE ------------------------------------------------
 INSERT INTO code_data_source(code_data_source_id, name, description, max_score) VALUES
-  (1001, 'code:gitleaks', 'Credential scanning for GitHub', 1.0);
+  (1001, 'code:gitleaks', 'Credential scanning for GitHub', 1.0),
+  (1002, 'code:dependency', 'Dependency vulnerability scanning for GitHub', 1.0);
 
 -- GOOGLE ------------------------------------------------
 INSERT INTO google_data_source(google_data_source_id, name, description, max_score) VALUES
