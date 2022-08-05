@@ -9,14 +9,17 @@ import (
 )
 
 func analyzeSMTP(target string, port int) (map[string]interface{}, error) {
-
+	open, err := checkSMTPOpenRelay(target, port)
+	if err != nil {
+		return nil, err
+	}
 	ret := map[string]interface{}{
-		"isSMTPOpenRelay": checkSMTPOpenRelay(target, port),
+		"isSMTPOpenRelay": open,
 	}
 	return ret, nil
 }
 
-func checkSMTPOpenRelay(target string, port int) bool {
+func checkSMTPOpenRelay(target string, port int) (bool, error) {
 	scanner, err := nmap.NewScanner(
 		nmap.WithTargets(target),
 		nmap.WithPorts(strconv.Itoa(port)),
@@ -27,21 +30,21 @@ func checkSMTPOpenRelay(target string, port int) bool {
 		nmap.WithTimingTemplate(nmap.TimingAggressive),
 	)
 	if err != nil {
-		return false
+		return false, fmt.Errorf("failed to create scanner for SMTP, err=%w", err)
 	}
 	result, warn, err := scanner.Run()
 	if err != nil {
 		fmt.Printf("Nmap warning: %v", warn)
-		return false
+		return false, fmt.Errorf("failed to run scanner for SMTP, err=%w", err)
 	}
 	for _, host := range result.Hosts {
 		for _, port := range host.Ports {
 			for _, script := range port.Scripts {
 				if strings.Contains(script.Output, "Server is an open relay") {
-					return true
+					return true, nil
 				}
 			}
 		}
 	}
-	return false
+	return false, nil
 }

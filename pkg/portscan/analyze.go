@@ -9,14 +9,14 @@ func (n *NmapResult) analyzeResult() error {
 	case "ssh":
 		data, err := analyzeSSH(n.Target, n.Port)
 		if err != nil {
-			return nil
+			return err
 		}
 		n.ScanDetail = data
 		return nil
 	case "smtp", "smtps", "submission":
 		data, err := analyzeSMTP(n.Target, n.Port)
 		if err != nil {
-			return nil
+			return err
 		}
 		n.ScanDetail = data
 		return nil
@@ -27,7 +27,7 @@ func (n *NmapResult) analyzeResult() error {
 		default:
 			data, err := analyzeHTTP(n.Target, n.Port)
 			if err != nil {
-				return nil
+				return err
 			}
 			n.ScanDetail = data
 		}

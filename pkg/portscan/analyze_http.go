@@ -13,10 +13,19 @@ import (
 )
 
 func analyzeHTTP(target string, port int) (map[string]interface{}, error) {
+	open, err := checkHTTPOpenProxy(target, port)
+	if err != nil {
+		return nil, err
+	}
+	ret := map[string]interface{}{
+		"isHTTPOpenProxy": open,
+	}
+
+	// append optional information only, so ignore error
 	url := makeURL(target, port)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		return ret, nil
 	}
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -39,14 +48,11 @@ func analyzeHTTP(target string, port int) (map[string]interface{}, error) {
 	if err != nil {
 		// TODO add Logger
 		fmt.Printf("%v", err)
-		return nil, err
+		return ret, nil
 	}
 	defer resp.Body.Close()
 
-	ret := map[string]interface{}{
-		"status":          resp.Status,
-		"isHTTPOpenProxy": checkHTTPOpenProxy(target, port),
-	}
+	ret["status"] = resp.Status
 	if resp.Header.Get("Server") != "" {
 		ret["server"] = resp.Header.Get("Server")
 	}
@@ -56,7 +62,7 @@ func analyzeHTTP(target string, port int) (map[string]interface{}, error) {
 	return ret, nil
 }
 
-func checkHTTPOpenProxy(target string, port int) bool {
+func checkHTTPOpenProxy(target string, port int) (bool, error) {
 	scanner, err := nmap.NewScanner(
 		nmap.WithTargets(target),
 		nmap.WithPorts(strconv.Itoa(port)),
@@ -67,24 +73,24 @@ func checkHTTPOpenProxy(target string, port int) bool {
 		nmap.WithTimingTemplate(nmap.TimingAggressive),
 	)
 	if err != nil {
-		return false
+		return false, fmt.Errorf("failed to create scanner for HTTP, err=%w", err)
 	}
 	result, warn, err := scanner.Run()
 	if err != nil {
 		// TODO add Logger
 		fmt.Printf("Nmap warning: %v", warn)
-		return false
+		return false, fmt.Errorf("failed to run scanner for HTTP, err=%w", err)
 	}
 	for _, host := range result.Hosts {
 		for _, port := range host.Ports {
 			for _, script := range port.Scripts {
 				if strings.Contains(script.Output, "Potentially OPEN proxy.") {
-					return true
+					return true, nil
 				}
 			}
 		}
 	}
-	return false
+	return false, nil
 }
 
 func makeURL(target string, port int) string {
