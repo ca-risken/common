@@ -455,40 +455,6 @@ CREATE TABLE code_data_source (
   PRIMARY KEY(code_data_source_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
-CREATE TABLE code_gitleaks (
-  gitleaks_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  code_data_source_id INT UNSIGNED NOT NULL,
-  name VARCHAR(64) NULL,
-  project_id INT UNSIGNED NOT NULL,
-  type ENUM('UNKNOWN_TYPE', 'ENTERPRISE' ,'ORGANIZATION', 'USER') NOT NULL DEFAULT 'UNKNOWN_TYPE',
-  base_url VARCHAR(128) NULL,
-  target_resource VARCHAR(128) NOT NULL,
-  repository_pattern VARCHAR(128) NULL,
-  github_user VARCHAR(64) NULL,
-  personal_access_token VARCHAR(255) NULL,
-  scan_public ENUM('false', 'true') NOT NULL DEFAULT 'true',
-  scan_internal ENUM('false', 'true') NOT NULL DEFAULT 'true',
-  scan_private ENUM('false', 'true') NOT NULL DEFAULT 'false',
-  gitleaks_config TEXT NULL,
-  status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
-  status_detail VARCHAR(255) NULL,
-  scan_at DATETIME NULL,
-  scan_succeeded_at DATETIME NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(gitleaks_id),
-  UNIQUE KEY uidx_code_gitleaks (code_data_source_id, name, project_id)
-) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
-
-CREATE TABLE code_enterprise_org (
-  gitleaks_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  login VARCHAR(128) NOT NULL,
-  project_id INT UNSIGNED NOT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(gitleaks_id, login)
-) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-
 CREATE TABLE code_github_setting (
   code_github_setting_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   project_id INT UNSIGNED NOT NULL,
