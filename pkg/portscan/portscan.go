@@ -16,6 +16,23 @@ type NmapResult struct {
 	ScanDetail   map[string]interface{} `json:"scan_detail"`
 }
 
+// TODO これまで握りつぶしていたエラーを呼び出し元で確認するために追加したError。確認が終わり次第削除予定
+type ResultAnalysisError struct {
+	err error
+}
+
+func (e *ResultAnalysisError) Error() string {
+	return fmt.Sprintf("failed to analyze portscan results, cause=%v", e.err)
+}
+
+func (e *ResultAnalysisError) Unwrap() error {
+	return e.err
+}
+
+func wrapResultAnalysisError(err error) error {
+	return &ResultAnalysisError{err}
+}
+
 func Scan(target, protocol string, fPort, tPort int) ([]*NmapResult, error) {
 	var ret []*NmapResult
 	nmapResults, err := runNmap(target, protocol, fPort, tPort)
@@ -23,7 +40,11 @@ func Scan(target, protocol string, fPort, tPort int) ([]*NmapResult, error) {
 		return []*NmapResult{}, err
 	}
 	for _, result := range nmapResults {
-		_ = result.analyzeResult()
+		// TODO 握りつぶしていたエラーを呼び出し元で判定して確認できるようにするため、専用の型で返す。確認が終わり次第errをそのまま返すように変更予定
+		err = result.analyzeResult()
+		if err != nil {
+			return nil, wrapResultAnalysisError(err)
+		}
 		ret = append(ret, result)
 	}
 	return ret, nil
