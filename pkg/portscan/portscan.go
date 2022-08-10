@@ -2,6 +2,7 @@ package portscan
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Ullaakut/nmap/v2"
 )
@@ -39,6 +40,7 @@ func Scan(target, protocol string, fPort, tPort int) ([]*NmapResult, error) {
 	if err != nil {
 		return []*NmapResult{}, err
 	}
+	time.Sleep(20 * time.Second)
 	for _, result := range nmapResults {
 		// TODO 握りつぶしていたエラーを呼び出し元で判定して確認できるようにするため、専用の型で返す。確認が終わり次第errをそのまま返すように変更予定
 		err = result.analyzeResult()
