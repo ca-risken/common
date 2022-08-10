@@ -46,6 +46,7 @@ func Scan(target, protocol string, fPort, tPort int) ([]*NmapResult, error) {
 		// TODO 握りつぶしていたエラーを呼び出し元で判定して確認できるようにするため、専用の型で返す。確認が終わり次第errをそのまま返すように変更予定
 		err = result.analyzeResult()
 		if err != nil {
+			fmt.Println("result analysis error")
 			return nil, wrapResultAnalysisError(err)
 		}
 		ret = append(ret, result)
