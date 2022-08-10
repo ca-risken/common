@@ -40,7 +40,7 @@ func Scan(target, protocol string, fPort, tPort int) ([]*NmapResult, error) {
 	if err != nil {
 		return []*NmapResult{}, err
 	}
-	fmt.Println("finish run nmap")
+	fmt.Printf("finish run nmap, nmapResultsCount: %d\n", len(nmapResults))
 	time.Sleep(20 * time.Second)
 	for _, result := range nmapResults {
 		// TODO 握りつぶしていたエラーを呼び出し元で判定して確認できるようにするため、専用の型で返す。確認が終わり次第errをそのまま返すように変更予定
