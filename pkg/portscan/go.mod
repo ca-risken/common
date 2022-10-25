@@ -1,6 +1,6 @@
 module github.com/ca-risken/common/pkg/portscan
 
-go 1.17
+go 1.18
 
 require (
 	github.com/Ullaakut/nmap v2.0.2+incompatible
