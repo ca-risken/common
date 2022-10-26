@@ -1,6 +1,6 @@
 module github.com/ca-risken/common/pkg/rpc
 
-go 1.17
+go 1.18
 
 require (
 	github.com/ca-risken/common/pkg/logging v0.0.0-20220517105456-de734080357a
