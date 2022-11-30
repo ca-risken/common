@@ -6,11 +6,13 @@ CREATE TABLE user (
   user_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   sub VARCHAR(255) NOT NULL,
   name VARCHAR(64) NOT NULL,
+  user_idp_key VARCHAR(255) NULL,
   activated ENUM('false', 'true') NOT NULL DEFAULT 'true',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(user_id),
-  UNIQUE KEY uidx_sub (sub)
+  UNIQUE KEY uidx_sub (sub),
+  UNIQUE KEY uidx_user_idp_key (user_idp_key)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE user_role (
