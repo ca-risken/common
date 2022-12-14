@@ -547,6 +547,7 @@ CREATE TABLE gcp_data_source (
   gcp_id INT UNSIGNED NOT NULL,
   google_data_source_id INT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
+  specific_version VARCHAR(64) NULL,
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail VARCHAR(255) NULL,
   scan_at DATETIME NULL,
