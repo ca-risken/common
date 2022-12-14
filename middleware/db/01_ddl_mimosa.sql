@@ -22,7 +22,7 @@ CREATE TABLE user_reserved (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(reserved_id),
-  UNIQUE KEY uidx_access_token (user_idp_key, role_id)
+  UNIQUE KEY uidx_user_reserved (user_idp_key, role_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE user_role (
