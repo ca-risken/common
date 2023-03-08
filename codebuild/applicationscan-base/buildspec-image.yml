@@ -1,0 +1,38 @@
+version: 0.2
+
+env:
+  variables:
+    IMAGE_APPLICATIONSCAN_BASE: "diagnosis/applicationscan-base"
+
+phases:
+  pre_build:
+    commands:
+      - echo Setting environment variables
+      - BUILD_OPT="--no-cache --pull"
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
+      - REGISTORY="public.ecr.aws/risken"
+      - REPO_REGION="us-east-1"
+
+      - echo Logging in to Amazon ECR...
+      - codebuild-breakpoint
+      - aws ecr-public get-login-password --region ${REPO_REGION} | docker login --username AWS --password-stdin ${REGISTORY}
+  build:
+    commands:
+      - echo Build applicationscan base image started on `date`
+      - git clone https://github.com/zaproxy/zaproxy.git
+      - cd zaproxy
+      - git checkout ${APPLICATIONSCAN_VERSION}
+      - TAG=${APPLICATIONSCAN_VERSION}_${OS}_${ARCH}
+      - docker build ${BUILD_OPT} -t ${IMAGE_APPLICATIONSCAN_BASE}:${TAG} -f docker/Dockerfile-bare ./docker
+
+      - echo Tagging the images...
+      # tag the specific version
+      - docker tag ${IMAGE_APPLICATIONSCAN_BASE}:${TAG} ${REGISTORY}/${IMAGE_APPLICATIONSCAN_BASE}:${TAG}
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+
+      # specific version
+      - docker push ${REGISTORY}/${IMAGE_APPLICATIONSCAN_BASE}:${TAG}

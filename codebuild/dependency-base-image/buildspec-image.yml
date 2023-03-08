@@ -1,0 +1,34 @@
+version: 0.2
+
+env:
+  variables:
+    REGISTRY: "public.ecr.aws/risken"
+    IMAGE_DEPENDENCY_BASE: "code/dependency-base"
+
+phases:
+  pre_build:
+    commands:
+      - echo Setting environment variables
+      - BUILD_OPT="--no-cache --pull"
+
+      - echo Logging in to Amazon ECR...
+      - codebuild-breakpoint
+      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin  ${REGISTRY}
+  build:
+    commands:
+      - echo Build dependency base image started on `date`
+      - TAG=${DEPENDENCY_BASE_VERSION}_${OS}_${ARCH}
+      - cd dockers/dependency-base
+      - docker build ${BUILD_OPT} -t ${IMAGE_DEPENDENCY_BASE}:${TAG} .
+
+      - echo Tagging the images...
+      # tag the specific version
+      - docker tag ${IMAGE_DEPENDENCY_BASE}:${TAG} ${REGISTRY}/${IMAGE_DEPENDENCY_BASE}:${TAG}
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+
+      # specific version
+      - docker push ${REGISTRY}/${IMAGE_DEPENDENCY_BASE}:${TAG}
