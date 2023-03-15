@@ -329,6 +329,7 @@ CREATE TABLE aws_rel_data_source (
   project_id INT UNSIGNED NOT NULL,
   assume_role_arn VARCHAR(255) NOT NULL,
   external_id VARCHAR(255) NULL,
+  specific_version VARCHAR(64) NULL,
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail TEXT NULL,
   scan_at DATETIME NULL,
