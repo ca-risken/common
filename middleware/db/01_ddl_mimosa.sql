@@ -536,7 +536,6 @@ CREATE TABLE gcp (
   gcp_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(64) NULL,
   project_id INT UNSIGNED NOT NULL,
-  gcp_organization_id VARCHAR(128) NULL,
   gcp_project_id VARCHAR(128) NOT NULL,
   verification_code VARCHAR(128) NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
