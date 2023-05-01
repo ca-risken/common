@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.16.4
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.18.5
 	github.com/ca-risken/common/pkg/logging v0.0.0-20220518032134-ad443b601efd
-	github.com/ca-risken/core v0.4.2-0.20221114035311-c4b88fcc3162
+	github.com/ca-risken/core v0.6.0
 	github.com/ca-risken/go-sqs-poller/worker/v5 v5.0.0-20220525093235-9148d33b6aee
 	github.com/stretchr/testify v1.7.1
 	google.golang.org/grpc v1.46.0
@@ -55,3 +55,5 @@ require (
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
+
+exclude github.com/ca-risken/core/proto/finding v0.0.0-20220420065103-ec7428a46fe5
