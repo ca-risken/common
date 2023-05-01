@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -76,24 +75,7 @@ func (n *NmapResult) GetScore() float32 {
 }
 
 func (n *NmapResult) GetDescription() string {
-	detail := n.ScanDetail
-	desc := fmt.Sprintf("target: %v, protocol: %v, port: %v, status: %v, service: %v", n.Target, n.Protocol, n.Port, n.Status, n.Service)
-	statusCode, ok := detail["status"]
-	if ok {
-		desc += fmt.Sprintf(", code: %v", statusCode)
-	}
-	server, ok := detail["server"]
-	if ok {
-		desc += fmt.Sprintf(", server: %v", server)
-	}
-	redirect, ok := detail["redirect"]
-	if ok {
-		if reflect.TypeOf(redirect).String() == "[]string" {
-			desc += fmt.Sprintf(", redirect: %v", strings.Join(redirect.([]string), ","))
-		} else {
-			desc += fmt.Sprintf(", redirect: %v", redirect)
-		}
-	}
+	desc := fmt.Sprintf("Specific port is exposed to the Internet (target=%s:%d)", n.Target, n.Port)
 	if len(desc) > 200 {
 		desc = desc[0:197] + "..."
 	}
@@ -184,21 +166,21 @@ func GetAdditionalCheckResult(key string) (AdditionalCheckResult, bool) {
 }
 
 var httpCheckResult = map[string]AdditionalCheckResult{
-	"isHTTPOpenProxy": AdditionalCheckResult{Score: 8.0, Tag: []string{"http"}, Type: "isHTTPOpenProxy",
+	"isHTTPOpenProxy": {Score: 8.0, Tag: []string{"http"}, Type: "isHTTPOpenProxy",
 		Description: "{TARGET} is Potentially OPEN proxy. port: {PORT}",
 		Risk: `HTTP Open Proxies is Enabled.
 	- Malicious client can use an open proxy to launch an attack that originates from the proxy server's IP.`,
 		Recommendation: `Disable open proxy.
 	- Restrict target TCP and UDP port to trusted IP addresses.
 	- Allow specific users to use the proxy by authenticating them.`},
-	"isSSHEnabledPasswordAuth": AdditionalCheckResult{Score: 8.0, Tag: []string{"ssh"}, Type: "isSSHEnabledPasswordAuth",
+	"isSSHEnabledPasswordAuth": {Score: 8.0, Tag: []string{"ssh"}, Type: "isSSHEnabledPasswordAuth",
 		Description: "{TARGET} is supported password authentication. port: {PORT}",
 		Risk: `SSH Password Authentication is Enabled.
 	- If weak passwords are used, ssh servers are vulnerable to brute force attacks.`,
 		Recommendation: `Stop the open proxy.
 	- Restrict target port to trusted IP addresses.
 	- disable password authentication.`},
-	"isSMTPOpenRelay": AdditionalCheckResult{Score: 8.0, Tag: []string{"smtp"}, Type: "isSMTPOpenRelay",
+	"isSMTPOpenRelay": {Score: 8.0, Tag: []string{"smtp"}, Type: "isSMTPOpenRelay",
 		Description: "{TARGET} is an open relay. port: {PORT}",
 		Risk: `SMTP Open Relay is Enabled.
 	- Spammers can exploit open SMTP relays to send large amounts of email.

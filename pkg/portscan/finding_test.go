@@ -105,7 +105,7 @@ func TestGetDescription(t *testing.T) {
 		expect     string
 	}{
 		{
-			name: "Not Exist StatusDetail",
+			name: "OK",
 			nmapResult: &NmapResult{
 				ResourceName: "hogeResource",
 				Target:       "example.com",
@@ -114,72 +114,7 @@ func TestGetDescription(t *testing.T) {
 				Service:      "hoge-service",
 				Port:         8080,
 			},
-			expect: fmt.Sprintf("target: %v, protocol: %v, port: %v, status: %v, service: %v", "example.com", "tcp", "8080", "closed", "hoge-service"),
-		},
-		{
-			name: "Exist StatusDetail (status)",
-			nmapResult: &NmapResult{
-				ResourceName: "hogeResource",
-				Target:       "example.com",
-				Protocol:     "tcp",
-				Status:       "closed",
-				Service:      "hoge-service",
-				Port:         8080,
-				ScanDetail: map[string]interface{}{
-					"status": 200,
-				},
-			},
-			expect: fmt.Sprintf("target: %v, protocol: %v, port: %v, status: %v, service: %v, code: %v", "example.com", "tcp", "8080", "closed", "hoge-service", "200"),
-		},
-		{
-			name: "Exist StatusDetail (status,server)",
-			nmapResult: &NmapResult{
-				ResourceName: "hogeResource",
-				Target:       "example.com",
-				Protocol:     "tcp",
-				Status:       "closed",
-				Service:      "hoge-service",
-				Port:         8080,
-				ScanDetail: map[string]interface{}{
-					"status": 200,
-					"server": "hoge-server",
-				},
-			},
-			expect: fmt.Sprintf("target: %v, protocol: %v, port: %v, status: %v, service: %v, code: %v, server: %v", "example.com", "tcp", "8080", "closed", "hoge-service", "200", "hoge-server"),
-		},
-		{
-			name: "Exist StatusDetail (status,server,redirect)",
-			nmapResult: &NmapResult{
-				ResourceName: "hogeResource",
-				Target:       "example.com",
-				Protocol:     "tcp",
-				Status:       "closed",
-				Service:      "hoge-service",
-				Port:         8080,
-				ScanDetail: map[string]interface{}{
-					"status":   200,
-					"server":   "hoge-server",
-					"redirect": []string{"http://hoge1.com/fuga", "http://hoge2.com/fuga"},
-				},
-			},
-			expect: fmt.Sprintf("target: %v, protocol: %v, port: %v, status: %v, service: %v, code: %v, server: %v, redirect: %v", "example.com", "tcp", "8080", "closed", "hoge-service", "200", "hoge-server", "http://hoge1.com/fuga,http://hoge2.com/fuga"),
-		},
-		{
-			name: "Exist StatusDetail (status,server,redirect) Over 200 char",
-			nmapResult: &NmapResult{
-				ResourceName: "hogeResource",
-				Target:       "example.com",
-				Protocol:     "tcp",
-				Status:       "closed",
-				Service:      "hoge-service",
-				Port:         8080,
-				ScanDetail: map[string]interface{}{
-					"status":   200,
-					"server":   "hoge-server",
-					"redirect": []string{"http://hoge1.com/fuga", "http://hoge2.com/fuga", "http://hoge2.com/fuga/piyopiyopiyo"},
-				},
-			},
-			expect: fmt.Sprintf("target: %v, protocol: %v, port: %v, status: %v, service: %v, code: %v, server: %v, redirect: %v", "example.com", "tcp", "8080", "closed", "hoge-service", "200", "hoge-server", "http://hoge1.com/fuga,http://hoge2.com/fuga,http://hoge2.com/fuga/pi..."),
+			expect: fmt.Sprintf("Specific port is exposed to the Internet (target=%s:%d)", "example.com", 8080),
 		},
 	}
 	for _, c := range cases {
