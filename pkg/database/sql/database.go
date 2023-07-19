@@ -1,6 +1,8 @@
 package sql
 
 import (
+	"log"
+	"os"
 	"time"
 
 	mysqldriver "github.com/go-sql-driver/mysql"
@@ -27,8 +29,17 @@ func Open(dsn string, logMode bool, maxConn int) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	logLevel := logger.Warn
 	if logMode {
-		db.Logger.LogMode(logger.Info)
+		logLevel = logger.Info
 	}
+
+	// https://github.com/go-gorm/gorm/blob/master/logger/logger.go
+	db.Logger = logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), logger.Config{
+		SlowThreshold:             2 * time.Second, // update from default logger
+		LogLevel:                  logLevel,
+		IgnoreRecordNotFoundError: true, // update from default logger
+		Colorful:                  true,
+	})
 	return db, nil
 }
