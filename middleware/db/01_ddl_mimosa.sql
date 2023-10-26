@@ -184,7 +184,7 @@ CREATE TABLE finding_setting (
 CREATE TABLE recommend (
   recommend_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   data_source VARCHAR(64) NOT NULL,
-  type VARCHAR(128) NOT NULL,
+  type VARCHAR(255) NOT NULL,
   risk TEXT NULL,
   recommendation TEXT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
