@@ -110,7 +110,7 @@ CREATE TABLE finding (
   description VARCHAR(200) NULL,
   data_source VARCHAR(64) NOT NULL,
   data_source_id VARCHAR(255) NOT NULL,
-  resource_name VARCHAR(255) NOT NULL,
+  resource_name VARCHAR(512) NOT NULL,
   project_id INT UNSIGNED NOT NULL,
   original_score FLOAT(5,2) UNSIGNED NOT NULL,
   score FLOAT(3,2) UNSIGNED NULL,
@@ -138,7 +138,7 @@ CREATE INDEX idx_project_id ON finding_tag (project_id, tag);
 
 CREATE TABLE resource (
   resource_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  resource_name VARCHAR(255) NOT NULL,
+  resource_name VARCHAR(512) NOT NULL,
   project_id INT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -172,7 +172,7 @@ CREATE TABLE pend_finding (
 CREATE TABLE finding_setting (
   finding_setting_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   project_id INT UNSIGNED NOT NULL,
-  resource_name VARCHAR(255) NOT NULL,
+  resource_name VARCHAR(512) NOT NULL,
   setting JSON NOT NULL,
   status ENUM('UNKNOWN', 'ACTIVE', 'DEACTIVE') NOT NULL DEFAULT 'UNKNOWN',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -263,7 +263,7 @@ CREATE TABLE alert_rule (
   name VARCHAR(200) NULL,
   project_id INT UNSIGNED NOT NULL,
   score FLOAT(3,2) UNSIGNED NOT NULL,
-  resource_name VARCHAR(255) NULL,
+  resource_name VARCHAR(512) NULL,
   tag VARCHAR(64) NULL,
   finding_cnt INT UNSIGNED NOT NULL DEFAULT 1,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
