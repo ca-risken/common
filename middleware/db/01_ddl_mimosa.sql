@@ -161,6 +161,7 @@ CREATE TABLE resource_tag (
 CREATE TABLE pend_finding (
   finding_id BIGINT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
+  pend_user_id INT UNSIGNED NULL,
   note TEXT NULL,
   reason ENUM('UNKNOWN', 'FALSE_POSITIVE') NOT NULL DEFAULT 'UNKNOWN',
   expired_at DATETIME NULL,
