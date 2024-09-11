@@ -48,4 +48,8 @@ INSERT INTO google_data_source(google_data_source_id, name, description, max_sco
   (1003, 'google:scc', 'Security Command Center', 1.0),
   (1004, 'google:portscan', 'Portscan for GCP', 10.0);
 
+-- AZURE ------------------------------------------------
+INSERT INTO azure_data_source(azure_data_source_id, name, description, max_score) VALUES
+  (1001, 'azure:prowler', 'Prowler for Azure', 1.0);
+
 commit;
