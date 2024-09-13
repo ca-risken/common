@@ -32,8 +32,8 @@ var (
 
 func init() {
 	pluginDir = PLUGIN_DIR
-	if os.Getenv("PLUGIN_FILE") != "" {
-		pluginFile = os.Getenv("PLUGIN_FILE")
+	if os.Getenv("PLUGIN_DIR") != "" {
+		pluginDir = os.Getenv("PLUGIN_DIR")
 	}
 
 	pluginFile = PLUGIN_FILE

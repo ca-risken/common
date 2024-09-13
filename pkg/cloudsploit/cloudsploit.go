@@ -36,7 +36,7 @@ func LoadCloudsploitSetting(path string) (*CloudsploitSetting, error) {
 		return nil, err
 	}
 
-	setting, err := parseCloudsploitSettingYaml(data)
+	setting, err := ParseCloudsploitSettingYaml(data)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func validateRegexp(fl validator.FieldLevel) bool {
 	return err == nil
 }
 
-func parseCloudsploitSettingYaml(data []byte) (*CloudsploitSetting, error) {
+func ParseCloudsploitSettingYaml(data []byte) (*CloudsploitSetting, error) {
 	var setting CloudsploitSetting
 	if err := yaml.Unmarshal(data, &setting); err != nil {
 		return nil, err
