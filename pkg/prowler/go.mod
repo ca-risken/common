@@ -1,6 +1,6 @@
 module github.com/ca-risken/common/pkg/prowler
 
-go 1.23.1
+go 1.22.0
 
 require (
 	github.com/go-git/go-git/v5 v5.12.0
