@@ -8,6 +8,7 @@ CREATE TABLE user (
   name VARCHAR(64) NOT NULL,
   user_idp_key VARCHAR(255) NULL,
   activated ENUM('false', 'true') NOT NULL DEFAULT 'true',
+  is_admin boolean NOT NULL DEFAULT false,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(user_id),
