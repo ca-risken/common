@@ -125,6 +125,16 @@ CREATE TABLE organization_policy (
   UNIQUE KEY uidx_policy (organization_id, name)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
+CREATE TABLE organization_user_reserved (
+  reserved_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_idp_key VARCHAR(255) NOT NULL,
+  role_id INT UNSIGNED NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(reserved_id),
+  UNIQUE KEY uidx_user_reserved (user_idp_key, role_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
 CREATE TABLE project (
   project_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(64) NOT NULL,
