@@ -370,6 +370,20 @@ CREATE TABLE report_finding (
   UNIQUE KEY uidx_report_finding (report_date, project_id, data_source, score)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
+CREATE TABLE report (
+  report_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id INT UNSIGNED NOT NULL,
+  name VARCHAR(200) NOT NULL,
+  type ENUM('UNKNOWN', 'Markdown', 'HTML') NOT NULL DEFAULT 'UNKNOWN',
+  status ENUM('UNKNOWN', 'OK' , 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
+  content TEXT,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(report_id),
+  UNIQUE KEY uidx_report (project_id, name),
+  FULLTEXT INDEX idx_content(content)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
 -- AWS ------------------------------------------------
 CREATE TABLE aws (
   aws_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
