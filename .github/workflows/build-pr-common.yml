@@ -16,6 +16,7 @@ jobs:
       IMAGE_PREFIX: "middleware"
       INSTALL_GO_VERSION: "1.18.2"
       GOLANGCI_LINT_VERSION: "v1.50.1"
+      BUILD_OPT: "--no-cache --pull"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,7 +26,6 @@ jobs:
           echo "PKG=${GITHUB_WORKSPACE}/pkg" >> $GITHUB_ENV
           echo "MIDDLEWARE=${GITHUB_WORKSPACE}/middleware" >> $GITHUB_ENV
           echo "DOCKERS=${GITHUB_WORKSPACE}/dockers" >> $GITHUB_ENV
-          echo "BUILD_OPT="--no-cache --pull"" >> $GITHUB_ENV
           echo "TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - uses: actions/setup-go@v6
