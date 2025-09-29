@@ -1,0 +1,71 @@
+name: Build and Tag Container for PR common
+
+on:
+    pull_request:
+      branches: [ master ]
+      types: [ opened, synchronize ]
+    workflow_dispatch:
+  
+permissions:
+    contents: read
+  
+jobs:
+  build:
+    runs-on: codebuild-mimosa-common-pr-runner-${{ github.run_id }}-${{ github.run_attempt }}
+    env:
+      IMAGE_PREFIX: "middleware"
+      INSTALL_GO_VERSION: "1.18.2"
+      GOLANGCI_LINT_VERSION: "v1.50.1"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        run: |
+          echo "PKG=${GITHUB_WORKSPACE}/pkg" >> $GITHUB_ENV
+          echo "MIDDLEWARE=${GITHUB_WORKSPACE}/middleware" >> $GITHUB_ENV
+          echo "DOCKERS=${GITHUB_WORKSPACE}/dockers" >> $GITHUB_ENV
+          echo "BUILD_OPT="--no-cache --pull"" >> $GITHUB_ENV
+          echo "TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Install Go and tools
+        run: |
+          goenv install ${INSTALL_GO_VERSION}
+          goenv global ${INSTALL_GO_VERSION}
+          go version
+
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin $GOLANGCI_LINT_VERSION
+          mv $(go env GOPATH)/bin/golangci-lint /usr/local/bin/
+          golangci-lint --version
+    
+      - name: Lint and test
+        run: |
+          echo Lint the sources...
+          make lint -k
+          echo Testing the sources...
+          cd ${PKG}/database/sql && go test ./...
+          cd ${PKG}/logging      && go test ./...
+          cd ${PKG}/portscan     && go test ./...
+          cd ${PKG}/profiler     && go test ./...
+          cd ${PKG}/rpc          && go test ./...
+          cd ${PKG}/sqs          && go test ./...
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build middleware and dockers
+        run: |
+          echo Build middleware started on `date`
+          echo Building the Docker images...
+          cd ${MIDDLEWARE} && make build-ci -j BUILD_OPT="${BUILD_OPT}" IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG=${TAG} IMAGE_REGISTRY=${{ secrets.DOCKER_REGISTRY }}
+          
+          echo Build dockers started on `date`
+          echo building the Docker images...
+          cd ${DOCKERS} && make build-ci -j BUILD_OPT="${BUILD_OPT}" IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_TAG=${TAG} IMAGE_REGISTRY=${{ secrets.DOCKER_REGISTRY }}
