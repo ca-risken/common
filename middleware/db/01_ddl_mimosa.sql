@@ -605,12 +605,10 @@ CREATE TABLE code_gitleaks_repository (
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail VARCHAR(255) NULL,
   scan_at DATETIME NULL,
-  error_notified_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(code_gitleaks_repository_id),
-  UNIQUE KEY uidx_code_gitleaks_repository (code_github_setting_id, repository_full_name),
-  FOREIGN KEY fk_code_gitleaks_repository_github_setting (code_github_setting_id) REFERENCES code_github_setting(code_github_setting_id) ON DELETE CASCADE
+  UNIQUE KEY uidx_code_gitleaks_repository (code_github_setting_id, repository_full_name)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 
@@ -635,12 +633,10 @@ CREATE TABLE code_dependency_repository (
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail VARCHAR(255) NULL,
   scan_at DATETIME NULL,
-  error_notified_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(code_dependency_repository_id),
-  UNIQUE KEY uidx_code_dependency_repository (code_github_setting_id, repository_full_name),
-  FOREIGN KEY fk_code_dependency_repository_github_setting (code_github_setting_id) REFERENCES code_github_setting(code_github_setting_id) ON DELETE CASCADE
+  UNIQUE KEY uidx_code_dependency_repository (code_github_setting_id, repository_full_name)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE code_codescan_setting (
@@ -667,12 +663,10 @@ CREATE TABLE code_codescan_repository (
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail VARCHAR(255) NULL,
   scan_at DATETIME NULL,
-  error_notified_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(code_codescan_repository_id),
-  UNIQUE KEY uidx_code_codescan_repository (code_github_setting_id, repository_full_name),
-  FOREIGN KEY fk_code_codescan_repository_github_setting (code_github_setting_id) REFERENCES code_github_setting(code_github_setting_id) ON DELETE CASCADE
+  UNIQUE KEY uidx_code_codescan_repository (code_github_setting_id, repository_full_name)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 -- GOOGLE ------------------------------------------------
