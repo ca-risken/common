@@ -6,12 +6,13 @@ on:
       types: [ opened, synchronize ]
     workflow_dispatch:
   
-permissions:
-    contents: read
+permissions: {}
   
 jobs:
-  build:
+  build-pr-common:
     runs-on: codebuild-mimosa-common-pr-runner-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      contents: read
     env:
       IMAGE_PREFIX: "middleware"
       INSTALL_GO_VERSION: "1.18.2"
