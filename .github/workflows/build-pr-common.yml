@@ -10,7 +10,7 @@ permissions:
     contents: read
   
 jobs:
-  build:
+  build-pr-common:
     runs-on: codebuild-mimosa-common-pr-runner-${{ github.run_id }}-${{ github.run_attempt }}
     env:
       IMAGE_PREFIX: "middleware"
