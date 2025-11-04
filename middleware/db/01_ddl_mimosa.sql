@@ -135,6 +135,28 @@ CREATE TABLE organization_user_reserved (
   UNIQUE KEY uidx_user_reserved (user_idp_key, role_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
+CREATE TABLE organization_access_token (
+  access_token_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  token_hash VARCHAR(255) NOT NULL,
+  name VARCHAR(64) NOT NULL,
+  description VARCHAR(255) NULL,
+  organization_id INT UNSIGNED NOT NULL,
+  expired_at DATETIME NOT NULL DEFAULT '9999-12-31 23:59:59',
+  last_updated_user_id INT UNSIGNED NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(access_token_id),
+  UNIQUE KEY uidx_access_token (organization_id, name)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE organization_access_token_role (
+  access_token_id INT UNSIGNED NOT NULL,
+  role_id INT UNSIGNED NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(access_token_id, role_id),
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+
 CREATE TABLE project (
   project_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(64) NOT NULL,
