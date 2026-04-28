@@ -155,7 +155,7 @@ CREATE TABLE organization_access_token_role (
   role_id INT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(access_token_id, role_id),
+  PRIMARY KEY(access_token_id, role_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 CREATE TABLE project (
@@ -203,6 +203,17 @@ CREATE TABLE organization_invitation (
   PRIMARY KEY(organization_id, project_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
+CREATE TABLE organization_notification (
+  notification_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(200) NULL,
+  organization_id INT UNSIGNED NOT NULL,
+  type VARCHAR(64) NOT NULL,
+  notify_setting JSON NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(notification_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
 CREATE TABLE finding (
   finding_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   description VARCHAR(200) NULL,
@@ -213,6 +224,8 @@ CREATE TABLE finding (
   original_score FLOAT(5,2) UNSIGNED NOT NULL,
   score FLOAT(3,2) UNSIGNED NULL,
   data JSON NULL,
+  ai_summary TEXT NULL,
+  ai_summary_created_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(finding_id),
