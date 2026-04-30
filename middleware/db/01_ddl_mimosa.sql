@@ -621,6 +621,17 @@ CREATE TABLE code_github_setting (
   UNIQUE KEY uidx_code_github_setting (name, project_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
+CREATE TABLE ghapp_setting_repository (
+  ghapp_setting_repository_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  code_github_setting_id INT UNSIGNED NOT NULL,
+  github_repository_id BIGINT UNSIGNED NOT NULL,
+  github_repository_full_name VARCHAR(255) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(ghapp_setting_repository_id),
+  UNIQUE KEY uidx_ghapp_setting_repository (code_github_setting_id, github_repository_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
 CREATE TABLE code_gitleaks_setting (
   code_github_setting_id INT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
