@@ -608,6 +608,11 @@ CREATE TABLE code_github_setting (
   name VARCHAR(64) NULL,
   github_user VARCHAR(64) NULL,
   personal_access_token VARCHAR(255) NULL,
+  installation_id BIGINT UNSIGNED NULL,
+  auth_mode VARCHAR(32) NOT NULL DEFAULT 'PERSONAL_ACCESS_TOKEN',
+  verification_status VARCHAR(32) NULL,
+  verified_github_user VARCHAR(64) NULL,
+  verified_at DATETIME NULL,
   type ENUM('UNKNOWN_TYPE', 'ORGANIZATION', 'USER') NOT NULL DEFAULT 'UNKNOWN_TYPE',
   base_url VARCHAR(128) NULL,
   target_resource VARCHAR(128) NOT NULL,
@@ -615,6 +620,17 @@ CREATE TABLE code_github_setting (
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(code_github_setting_id),
   UNIQUE KEY uidx_code_github_setting (name, project_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
+
+CREATE TABLE ghapp_setting_repository (
+  ghapp_setting_repository_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  code_github_setting_id INT UNSIGNED NOT NULL,
+  github_repository_id BIGINT UNSIGNED NOT NULL,
+  github_repository_full_name VARCHAR(255) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(ghapp_setting_repository_id),
+  UNIQUE KEY uidx_ghapp_setting_repository (code_github_setting_id, github_repository_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE code_gitleaks_setting (
