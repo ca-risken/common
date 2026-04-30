@@ -608,7 +608,7 @@ CREATE TABLE code_github_setting (
   github_user VARCHAR(64) NULL,
   personal_access_token VARCHAR(255) NULL,
   installation_id BIGINT UNSIGNED NULL,
-  auth_mode VARCHAR(32) NULL,
+  auth_mode VARCHAR(32) NOT NULL DEFAULT 'PERSONAL_ACCESS_TOKEN',
   verification_status VARCHAR(32) NULL,
   verified_github_user VARCHAR(64) NULL,
   verified_at DATETIME NULL,
