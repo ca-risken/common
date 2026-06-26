@@ -46,6 +46,11 @@ func TestNewOAuthClient(t *testing.T) {
 			conf:      &OAuthConfig{ClientID: "client-id", ClientSecret: "client-secret", APIBaseURL: "https://attacker.example"},
 			wantError: true,
 		},
+		{
+			name:      "NG relative redirect url",
+			conf:      &OAuthConfig{ClientID: "client-id", ClientSecret: "client-secret", RedirectURL: "/api/v1/code/github-app/oauth/callback"},
+			wantError: true,
+		},
 	}
 
 	for _, c := range cases {
@@ -71,6 +76,7 @@ func TestAuthorizationURL(t *testing.T) {
 	client, err := NewOAuthClient(&OAuthConfig{
 		ClientID:     "client-id",
 		ClientSecret: "client-secret",
+		RedirectURL:  "https://risken.example/api/v1/code/github-app/oauth/callback",
 		Scopes:       []string{"read:org"},
 	})
 	if err != nil {
@@ -85,13 +91,14 @@ func TestAuthorizationURL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("parse auth url: %v", err)
 	}
-	if u.String() != "https://github.com/login/oauth/authorize?client_id=client-id&response_type=code&scope=read%3Aorg&state=state-value" {
+	if u.String() != "https://github.com/login/oauth/authorize?client_id=client-id&redirect_uri=https%3A%2F%2Frisken.example%2Fapi%2Fv1%2Fcode%2Fgithub-app%2Foauth%2Fcallback&response_type=code&scope=read%3Aorg&state=state-value" {
 		t.Fatalf("Unexpected auth url: %s", u.String())
 	}
 }
 
 func TestExchangeCodeAndGetAuthenticatedUser(t *testing.T) {
 	var gotCode string
+	var gotRedirectURL string
 	var gotAuthorization string
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -103,6 +110,7 @@ func TestExchangeCodeAndGetAuthenticatedUser(t *testing.T) {
 				t.Fatalf("parse form: %v", err)
 			}
 			gotCode = r.Form.Get("code")
+			gotRedirectURL = r.Form.Get("redirect_uri")
 			w.Header().Set("Content-Type", "application/json")
 			if _, err := w.Write([]byte(`{"access_token":"user-token","token_type":"bearer"}`)); err != nil {
 				t.Fatalf("write token response: %v", err)
@@ -128,6 +136,7 @@ func TestExchangeCodeAndGetAuthenticatedUser(t *testing.T) {
 		ClientSecret:             "client-secret",
 		OAuthBaseURL:             server.URL,
 		APIBaseURL:               server.URL,
+		RedirectURL:              "https://risken.example/api/v1/code/github-app/oauth/callback",
 		AllowedOAuthBaseURLHosts: []string{serverURL.Hostname()},
 		AllowedAPIBaseURLHosts:   []string{serverURL.Hostname()},
 	})
@@ -141,6 +150,9 @@ func TestExchangeCodeAndGetAuthenticatedUser(t *testing.T) {
 	}
 	if gotCode != "oauth-code" {
 		t.Fatalf("Unexpected oauth code: %s", gotCode)
+	}
+	if gotRedirectURL != "https://risken.example/api/v1/code/github-app/oauth/callback" {
+		t.Fatalf("Unexpected redirect_uri: %s", gotRedirectURL)
 	}
 
 	origNewGitHubOAuthHTTPClient := newGitHubOAuthHTTPClient
