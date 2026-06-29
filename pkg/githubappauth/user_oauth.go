@@ -30,6 +30,7 @@ type OAuthConfig struct {
 	ClientSecret             string
 	OAuthBaseURL             string
 	APIBaseURL               string
+	RedirectURL              string
 	Scopes                   []string
 	AllowedOAuthBaseURLHosts []string
 	AllowedAPIBaseURLHosts   []string
@@ -61,10 +62,15 @@ func NewOAuthClient(conf *OAuthConfig) (*OAuthClient, error) {
 	if err != nil {
 		return nil, err
 	}
+	redirectURL, err := validateOAuthRedirectURL(conf.RedirectURL)
+	if err != nil {
+		return nil, err
+	}
 	client.apiBaseURL = apiBaseURL
 	client.oauthConfig = &oauth2.Config{
 		ClientID:     conf.ClientID,
 		ClientSecret: conf.ClientSecret,
+		RedirectURL:  redirectURL,
 		Scopes:       conf.Scopes,
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  oauthBaseURL.ResolveReference(&url.URL{Path: "login/oauth/authorize"}).String(),
@@ -111,6 +117,20 @@ func (c *OAuthClient) validateOAuthBaseURL(baseURL string) (*url.URL, error) {
 		u.Path += "/"
 	}
 	return u, nil
+}
+
+func validateOAuthRedirectURL(redirectURL string) (string, error) {
+	if redirectURL == "" {
+		return "", nil
+	}
+	u, err := url.Parse(redirectURL)
+	if err != nil {
+		return "", err
+	}
+	if (u.Scheme != "https" && u.Scheme != "http") || u.Host == "" {
+		return "", fmt.Errorf("github app oauth redirect_url must be an absolute http or https URL: %s", redirectURL)
+	}
+	return redirectURL, nil
 }
 
 func (c *OAuthClient) validateAPIBaseURL(baseURL string) (*url.URL, error) {
