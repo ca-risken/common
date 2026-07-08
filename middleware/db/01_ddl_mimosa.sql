@@ -237,7 +237,7 @@ CREATE TABLE remediation_proposal (
   request_id VARCHAR(64) NOT NULL,
   finding_id BIGINT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
-  status VARCHAR(20) NOT NULL,
+  status ENUM('PENDING', 'SUCCEEDED', 'FAILED') NOT NULL DEFAULT 'PENDING',
   error_message TEXT NULL,
   remediation_plan JSON NULL,
   generated_at DATETIME NULL,
