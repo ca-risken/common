@@ -234,7 +234,7 @@ CREATE TABLE finding (
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE remediation_proposal (
-  request_id VARCHAR(64) NOT NULL,
+  remediation_proposal_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   finding_id BIGINT UNSIGNED NOT NULL,
   project_id INT UNSIGNED NOT NULL,
   status ENUM('PENDING', 'SUCCEEDED', 'FAILED') NOT NULL DEFAULT 'PENDING',
@@ -243,10 +243,10 @@ CREATE TABLE remediation_proposal (
   generated_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(request_id),
+  PRIMARY KEY(remediation_proposal_id),
   INDEX idx_finding(finding_id, project_id, created_at DESC),
   INDEX idx_project_status(project_id, status, created_at)
-) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE finding_tag (
   finding_tag_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
