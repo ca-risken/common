@@ -214,6 +214,18 @@ CREATE TABLE organization_notification (
   PRIMARY KEY(notification_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
+CREATE TABLE organization_alert_cond_notification (
+  organization_id INT UNSIGNED NOT NULL,
+  project_id INT UNSIGNED NOT NULL,
+  alert_condition_id INT UNSIGNED NOT NULL,
+  notification_id INT UNSIGNED NOT NULL,
+  cache_second INT UNSIGNED NOT NULL DEFAULT 1800,
+  notified_at DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(organization_id, project_id, alert_condition_id, notification_id)
+) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+
 CREATE TABLE finding (
   finding_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   description VARCHAR(200) NULL,
