@@ -223,7 +223,8 @@ CREATE TABLE organization_alert_cond_notification (
   notified_at DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY(organization_id, project_id, alert_condition_id, notification_id)
+  PRIMARY KEY(alert_condition_id, notification_id),
+  INDEX idx_organization_project(organization_id, project_id)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 CREATE TABLE finding (
