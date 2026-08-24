@@ -219,6 +219,7 @@ CREATE TABLE organization_alert_cond_notification (
   project_id INT UNSIGNED NOT NULL,
   alert_condition_id INT UNSIGNED NOT NULL,
   notification_id INT UNSIGNED NOT NULL,
+  enabled BOOLEAN NOT NULL DEFAULT TRUE,
   cache_second INT UNSIGNED NOT NULL DEFAULT 1800,
   notified_at DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
