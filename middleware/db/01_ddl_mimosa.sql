@@ -231,6 +231,8 @@ CREATE TABLE organization_alert_cond_notification (
 CREATE TABLE finding (
   finding_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   description VARCHAR(200) NULL,
+  provider VARCHAR(64) NOT NULL DEFAULT '',
+  provider_target VARCHAR(255) NOT NULL DEFAULT '',
   data_source VARCHAR(64) NOT NULL,
   data_source_id VARCHAR(255) NOT NULL,
   resource_name VARCHAR(512) NOT NULL,
