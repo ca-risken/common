@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/Ullaakut/nmap v2.0.2+incompatible
 	github.com/Ullaakut/nmap/v2 v2.1.1
-	github.com/ca-risken/core v0.6.0
+	github.com/ca-risken/core v0.16.1-0.20260928031245-6dc557e18be1
 )
 
 require (
