@@ -14,14 +14,18 @@ func TestGetFindings(t *testing.T) {
 		projectID        uint32
 		dataSource       string
 		data             string
+		provider         string
+		providerTarget   string
 		nmapResult       *NmapResult
 		numberOfFindings int
 	}{
 		{
-			name:       "1 findings created",
-			projectID:  1001,
-			dataSource: "hogeDataSource",
-			data:       "hogeData",
+			name:           "1 findings created",
+			projectID:      1001,
+			dataSource:     "hogeDataSource",
+			data:           "hogeData",
+			provider:       "aws",
+			providerTarget: "123456789012",
 			nmapResult: &NmapResult{
 				ResourceName: "hogeResource",
 				Target:       "example.com",
@@ -32,10 +36,12 @@ func TestGetFindings(t *testing.T) {
 			numberOfFindings: 1,
 		},
 		{
-			name:       "2 findings created",
-			projectID:  1001,
-			dataSource: "hogeDataSource",
-			data:       "hogeData",
+			name:           "2 findings created",
+			projectID:      1001,
+			dataSource:     "hogeDataSource",
+			data:           "hogeData",
+			provider:       "google",
+			providerTarget: "gcp-project-id",
 			nmapResult: &NmapResult{
 				ResourceName: "hogeResource",
 				Target:       "example.com",
@@ -51,7 +57,7 @@ func TestGetFindings(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			findings := c.nmapResult.GetFindings(c.projectID, c.dataSource, c.data)
+			findings := c.nmapResult.GetFindings(c.projectID, c.dataSource, c.data, c.provider, c.providerTarget)
 			nof := len(findings)
 			if c.numberOfFindings != nof {
 				t.Fatalf("Unexpected number of findings: want=%v, got=%v", c.numberOfFindings, nof)
