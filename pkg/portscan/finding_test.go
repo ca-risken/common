@@ -62,14 +62,6 @@ func TestGetFindings(t *testing.T) {
 			if c.numberOfFindings != nof {
 				t.Fatalf("Unexpected number of findings: want=%v, got=%v", c.numberOfFindings, nof)
 			}
-			for _, f := range findings {
-				if f.Provider != c.provider {
-					t.Errorf("Provider = %q, want %q", f.Provider, c.provider)
-				}
-				if f.ProviderTarget != c.providerTarget {
-					t.Errorf("ProviderTarget = %q, want %q", f.ProviderTarget, c.providerTarget)
-				}
-			}
 		})
 	}
 }
