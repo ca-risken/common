@@ -10,9 +10,11 @@ import (
 	"github.com/ca-risken/core/proto/finding"
 )
 
-func (n *NmapResult) GetFindings(projectID uint32, dataSource, data string) []*finding.FindingForUpsert {
+func (n *NmapResult) GetFindings(projectID uint32, dataSource, data, provider, providerTarget string) []*finding.FindingForUpsert {
 	var ret []*finding.FindingForUpsert
 	findingNmap := &finding.FindingForUpsert{
+		Provider:         provider,
+		ProviderTarget:   providerTarget,
 		Description:      n.GetDescription(),
 		DataSource:       dataSource,
 		DataSourceId:     n.GetDataSourceID(""),
@@ -30,6 +32,8 @@ func (n *NmapResult) GetFindings(projectID uint32, dataSource, data string) []*f
 		if detail == true {
 			addResult := httpCheckResult[key]
 			ret = append(ret, &finding.FindingForUpsert{
+				Provider:         provider,
+				ProviderTarget:   providerTarget,
 				Description:      addResult.GetDescription(n.Target, n.Port),
 				DataSource:       dataSource,
 				DataSourceId:     n.GetDataSourceID(""),
