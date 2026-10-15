@@ -229,9 +229,9 @@ CREATE TABLE organization_alert_cond_notification (
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 CREATE TABLE finding (
-  asset_type VARCHAR(32) NOT NULL DEFAULT '',
-  asset_key VARCHAR(43) NOT NULL DEFAULT '',
-  asset_name TEXT NOT NULL DEFAULT (''),
+  asset_type VARCHAR(32) DEFAULT NULL,
+  asset_key VARCHAR(43) DEFAULT NULL,
+  asset_name TEXT DEFAULT NULL,
   finding_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   description VARCHAR(200) NULL,
   provider VARCHAR(32) NULL,
