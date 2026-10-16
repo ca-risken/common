@@ -229,6 +229,9 @@ CREATE TABLE organization_alert_cond_notification (
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 CREATE TABLE finding (
+  asset_type VARCHAR(32) DEFAULT NULL,
+  asset_key VARCHAR(43) DEFAULT NULL,
+  asset_name TEXT DEFAULT NULL,
   finding_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   description VARCHAR(200) NULL,
   provider VARCHAR(32) NULL,
@@ -246,7 +249,8 @@ CREATE TABLE finding (
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY(finding_id),
   UNIQUE KEY uidx_data_source (project_id, data_source, data_source_id),
-  INDEX idx_score(project_id, score, updated_at)
+  INDEX idx_score(project_id, score, updated_at),
+  INDEX idx_asset(project_id, asset_type, asset_key)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE remediation_proposal (
