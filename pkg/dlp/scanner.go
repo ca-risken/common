@@ -50,10 +50,15 @@ func (s *Scanner) Scan(ctx context.Context, req ScanRequest) (*ScanResponse, err
 	if len(data) == 0 {
 		return nil, nil
 	}
+	if strings.EqualFold(path.Ext(req.FileName), ".zip") {
+		return s.scanZIP(ctx, data)
+	}
+	return s.scanContents(ctx, req.FileName, http.DetectContentType(data), data)
+}
 
-	contentType := http.DetectContentType(data)
-	fileName := limitUTF8(path.Base(req.FileName), 1024)
-	if contentType == "application/pdf" || strings.EqualFold(path.Ext(req.FileName), ".pdf") {
+func (s *Scanner) scanContents(ctx context.Context, name, contentType string, data []byte) (*ScanResponse, error) {
+	fileName := limitUTF8(path.Base(name), 1024)
+	if contentType == "application/pdf" || strings.EqualFold(path.Ext(name), ".pdf") {
 		return s.pdf.scan(ctx, fileName, data)
 	}
 
@@ -66,8 +71,8 @@ func (s *Scanner) Scan(ctx context.Context, req ScanRequest) (*ScanResponse, err
 			return &ScanResponse{Classification: classification}, nil
 		}
 		coreReq.Image = data
-	case strings.HasPrefix(contentType, "text/") || hasTextExtension(req.FileName):
-		text, ok := decodeText(req.FileName, data)
+	case strings.HasPrefix(contentType, "text/") || hasTextExtension(name):
+		text, ok := decodeText(name, data)
 		if !ok {
 			return nil, nil
 		}

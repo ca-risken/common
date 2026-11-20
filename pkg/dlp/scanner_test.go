@@ -47,7 +47,7 @@ func TestScanFile(t *testing.T) {
 		{name: "excluded.js", data: []byte("const x = 1")},
 		{name: "image.jpg", data: jpg.Bytes(), want: &Classification{Input: "image"}},
 		{name: "image.png", data: pngImage.Bytes(), want: &Classification{Input: "image"}},
-		{name: "archive.zip", data: []byte{'P', 'K', 3, 4, 0, 0}},
+		{name: "unsupported archive-based file.docx", data: []byte{'P', 'K', 3, 4, 0, 0}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
