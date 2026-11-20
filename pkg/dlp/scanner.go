@@ -50,8 +50,15 @@ func (s *Scanner) Scan(ctx context.Context, req ScanRequest) (*ScanResponse, err
 	if len(data) == 0 {
 		return nil, nil
 	}
-	if strings.EqualFold(path.Ext(req.FileName), ".zip") {
+	ext := path.Ext(req.FileName)
+	if strings.EqualFold(ext, ".zip") {
 		return s.scanZIP(ctx, data)
+	}
+	if strings.EqualFold(ext, ".gz") {
+		name := strings.TrimSuffix(req.FileName, ext)
+		if strings.EqualFold(path.Ext(name), ".log") {
+			return s.scanGZIPLog(ctx, name, data, maxBytes)
+		}
 	}
 	return s.scanContents(ctx, req.FileName, http.DetectContentType(data), data)
 }
