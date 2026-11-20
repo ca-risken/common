@@ -4,13 +4,10 @@ import (
 	"bytes"
 	"context"
 	json "encoding/json/v2"
-	"errors"
 	"fmt"
 	"image/jpeg"
-	"io"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/ca-risken/core/proto/ai"
 	"github.com/google/go-cmp/cmp"
@@ -51,27 +48,24 @@ func TestPDFScanner(t *testing.T) {
 		}
 		return &ai.ClassifySensitiveContentResponse{Sensitivity: ai.Sensitivity_SENSITIVITY_FALSE}, nil
 	})
-	scanner := NewPDFScanner(classifier)
-	t.Cleanup(func() { closeTestPDFScanner(t, scanner) })
+	scanner := NewScanner(classifier, &Config{})
+	t.Cleanup(func() { closeTestPDFScanner(t, scanner.pdf) })
 
-	got, err := scanner.Scan(t.Context(), "folder/test.pdf", bytes.NewReader(samplePDF()))
+	got, err := scanner.Scan(t.Context(), ScanRequest{FileName: "folder/test.pdf", Reader: bytes.NewReader(samplePDF())})
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := PDFScan{
-		Object: "folder/test.pdf", TotalPages: 2, Complete: true,
-		Pages: []PDFPage{
-			{
-				Number:      1,
-				Input:       "text",
-				Sensitivity: ai.Sensitivity_SENSITIVITY_TRUE,
-				Categories:  []ai.SensitiveContentCategory{ai.SensitiveContentCategory_SENSITIVE_CONTENT_CATEGORY_CREDENTIAL},
-				ContentKind: ai.ContentKind_CONTENT_KIND_DOCUMENT,
-				TestData:    ai.TestData_TEST_DATA_TRUE,
-			},
-			{Number: 2, Input: "image", Sensitivity: ai.Sensitivity_SENSITIVITY_FALSE},
+	want := &ScanResponse{Complete: true, PDFResult: &PDFResult{TotalPages: 2, Pages: []PDFPage{
+		{
+			Number:      1,
+			Input:       "text",
+			Sensitivity: ai.Sensitivity_SENSITIVITY_TRUE,
+			Categories:  []ai.SensitiveContentCategory{ai.SensitiveContentCategory_SENSITIVE_CONTENT_CATEGORY_CREDENTIAL},
+			ContentKind: ai.ContentKind_CONTENT_KIND_DOCUMENT,
+			TestData:    ai.TestData_TEST_DATA_TRUE,
 		},
-	}
+		{Number: 2, Input: "image", Sensitivity: ai.Sensitivity_SENSITIVITY_FALSE},
+	}}}
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("PDF scan mismatch (-want +got):\n%s", diff)
 	}
@@ -83,45 +77,12 @@ func TestPDFScanner(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var cached PDFScan
+	var cached ScanResponse
 	if err := json.Unmarshal(encoded, &cached); err != nil {
 		t.Fatal(err)
 	}
-	if diff := cmp.Diff(want, cached); diff != "" {
+	if diff := cmp.Diff(want, &cached); diff != "" {
 		t.Errorf("cached PDF scan mismatch (-want +got):\n%s", diff)
-	}
-}
-
-func TestPDFScannerRechecksPublicAccessBeforeUsingCache(t *testing.T) {
-	t.Parallel()
-
-	updated := time.Date(2026, time.November, 20, 0, 0, 0, 0, time.UTC)
-	previous := []PDFScan{
-		{Object: "private.pdf", Updated: updated, Complete: true},
-		{Object: "public.pdf", Updated: updated, Complete: true},
-	}
-	objects := []PDFObject{
-		{
-			Name: "private.pdf", Updated: updated,
-			Open: func(context.Context) (io.ReadCloser, error) {
-				return nil, errors.New("anonymous read denied")
-			},
-		},
-		{
-			Name: "public.pdf", Updated: updated,
-			Open: func(context.Context) (io.ReadCloser, error) {
-				return io.NopCloser(strings.NewReader("")), nil
-			},
-		},
-	}
-	scanner := &PDFScanner{}
-	got := scanner.ScanObjects(t.Context(), objects, previous)
-	want := []PDFScan{
-		{Object: "private.pdf", Updated: updated},
-		previous[1],
-	}
-	if diff := cmp.Diff(want, got); diff != "" {
-		t.Errorf("cached PDF scans mismatch (-want +got):\n%s", diff)
 	}
 }
 
@@ -132,28 +93,28 @@ func BenchmarkPDFScanner(b *testing.B) {
 	})
 	b.Run("cold", func(b *testing.B) {
 		for b.Loop() {
-			scanner := NewPDFScanner(classifier)
-			if _, err := scanner.Scan(b.Context(), "test.pdf", bytes.NewReader(input)); err != nil {
+			scanner := NewScanner(classifier, &Config{})
+			if _, err := scanner.Scan(b.Context(), ScanRequest{FileName: "test.pdf", Reader: bytes.NewReader(input)}); err != nil {
 				b.Fatal(err)
 			}
-			closeTestPDFScanner(b, scanner)
+			closeTestPDFScanner(b, scanner.pdf)
 		}
 	})
 	b.Run("warm", func(b *testing.B) {
-		scanner := NewPDFScanner(classifier)
-		defer closeTestPDFScanner(b, scanner)
-		if _, err := scanner.Scan(b.Context(), "test.pdf", bytes.NewReader(input)); err != nil {
+		scanner := NewScanner(classifier, &Config{})
+		defer closeTestPDFScanner(b, scanner.pdf)
+		if _, err := scanner.Scan(b.Context(), ScanRequest{FileName: "test.pdf", Reader: bytes.NewReader(input)}); err != nil {
 			b.Fatal(err)
 		}
 		for b.Loop() {
-			if _, err := scanner.Scan(b.Context(), "test.pdf", bytes.NewReader(input)); err != nil {
+			if _, err := scanner.Scan(b.Context(), ScanRequest{FileName: "test.pdf", Reader: bytes.NewReader(input)}); err != nil {
 				b.Fatal(err)
 			}
 		}
 	})
 }
 
-func closeTestPDFScanner(t testing.TB, scanner *PDFScanner) {
+func closeTestPDFScanner(t testing.TB, scanner *pdfScanner) {
 	t.Helper()
 	pool, err := scanner.pool()
 	if err != nil {

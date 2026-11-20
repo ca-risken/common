@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"path"
 	"strings"
 	"sync"
 	"time"
@@ -25,42 +24,17 @@ const (
 	maxTextBytes   = 32 << 10
 	maxImageBytes  = 2 << 20
 	maxImageEdge   = 2048
-	pdfTimeout     = 2 * time.Minute
+	scanTimeout    = 2 * time.Minute
 	pdfMemoryPages = 2048 // WebAssembly pages of 64 KiB each.
 )
 
-type PDFScan struct {
-	Object     string    `json:"object"`
-	Updated    time.Time `json:"updated,omitzero"`
-	TotalPages int       `json:"total_pages,omitempty"`
-	Pages      []PDFPage `json:"pages,omitempty"`
-	Complete   bool      `json:"complete"`
-}
-
-type PDFObject struct {
-	Name    string
-	Updated time.Time
-	Open    func(context.Context) (io.ReadCloser, error)
-}
-
-// PDFPage keeps the Core enum types. The cached JSON uses their numeric values.
-type PDFPage struct {
-	Number      int                           `json:"number"`
-	Input       string                        `json:"input,omitempty"`
-	Truncated   bool                          `json:"truncated,omitempty"`
-	Sensitivity ai.Sensitivity                `json:"sensitivity"`
-	Categories  []ai.SensitiveContentCategory `json:"categories,omitempty"`
-	ContentKind ai.ContentKind                `json:"content_kind,omitzero"`
-	TestData    ai.TestData                   `json:"test_data,omitzero"`
-}
-
-type PDFScanner struct {
+type pdfScanner struct {
 	client ai.SensitiveContentServiceClient
 	pool   func() (pdfium.Pool, error)
 }
 
-func NewPDFScanner(client ai.SensitiveContentServiceClient) *PDFScanner {
-	return &PDFScanner{
+func newPDFScanner(client ai.SensitiveContentServiceClient) *pdfScanner {
+	return &pdfScanner{
 		client: client,
 		pool: sync.OnceValues(func() (pdfium.Pool, error) {
 			return webassembly.Init(webassembly.Config{
@@ -79,51 +53,14 @@ func NewPDFScanner(client ai.SensitiveContentServiceClient) *PDFScanner {
 	}
 }
 
-// IsPDFObject accepts PDF names from the bucket listing without downloading objects.
-func IsPDFObject(name string) bool {
-	return strings.EqualFold(path.Ext(name), ".pdf")
-}
-
-// ScanObjects reviews a bounded batch and reuses completed results for unchanged PDFs.
-func (s *PDFScanner) ScanObjects(ctx context.Context, objects []PDFObject, previous []PDFScan) []PDFScan {
-	ctx, cancel := context.WithTimeout(ctx, pdfTimeout)
+func (s *pdfScanner) scan(ctx context.Context, fileName string, data []byte) (*ScanResponse, error) {
+	result := &ScanResponse{PDFResult: &PDFResult{}}
+	if len(data) > maxPDFBytes {
+		return result, errors.New("PDF exceeds size limit")
+	}
+	ctx, cancel := context.WithTimeout(ctx, scanTimeout)
 	defer cancel()
-	cached := make(map[string]PDFScan, len(previous))
-	for _, scan := range previous {
-		if scan.Complete && !scan.Updated.IsZero() {
-			cached[scan.Object] = scan
-		}
-	}
-	var results []PDFScan
-	for _, object := range objects {
-		result := PDFScan{Object: object.Name, Updated: object.Updated}
-		if ctx.Err() == nil {
-			reader, err := object.Open(ctx)
-			if err == nil {
-				if scan, ok := cached[object.Name]; ok && object.Updated.Equal(scan.Updated) {
-					result = scan
-				} else {
-					result, _ = s.Scan(ctx, object.Name, reader)
-				}
-				_ = reader.Close()
-				result.Updated = object.Updated
-			}
-		}
-		results = append(results, result)
-	}
-	return results
-}
 
-// Scan reads a publicly readable PDF and records classification metadata for each
-// attempted page. The caller retains ownership of the reader.
-func (s *PDFScanner) Scan(ctx context.Context, object string, reader io.Reader) (PDFScan, error) {
-	result := PDFScan{Object: object}
-	ctx, cancel := context.WithTimeout(ctx, pdfTimeout)
-	defer cancel()
-	data, err := io.ReadAll(io.LimitReader(reader, maxPDFBytes+1))
-	if err != nil || len(data) > maxPDFBytes || len(data) == 0 {
-		return result, errors.New("could not read PDF within size limit")
-	}
 	pool, err := s.pool()
 	if err != nil {
 		return result, errors.New("could not initialize PDFium")
@@ -160,7 +97,7 @@ func (s *PDFScanner) Scan(ctx context.Context, object string, reader io.Reader) 
 			return result, ctx.Err()
 		}
 		page := requests.Page{ByIndex: new(requests.PageByIndex{Document: document.Document, Index: i})}
-		classification, reviewed := s.scanPage(ctx, instance, page, limitUTF8(path.Base(object), 1024))
+		classification, reviewed := s.scanPage(ctx, instance, page, fileName)
 		classification.Number = i + 1
 		result.Pages = append(result.Pages, classification)
 		result.Complete = result.Complete && reviewed && !classification.Truncated
@@ -168,7 +105,7 @@ func (s *PDFScanner) Scan(ctx context.Context, object string, reader io.Reader) 
 	return result, nil
 }
 
-func (s *PDFScanner) scanPage(ctx context.Context, instance pdfium.Pdfium, page requests.Page, fileName string) (PDFPage, bool) {
+func (s *pdfScanner) scanPage(ctx context.Context, instance pdfium.Pdfium, page requests.Page, fileName string) (PDFPage, bool) {
 	var result PDFPage
 	req := &ai.ClassifySensitiveContentRequest{FileName: fileName}
 	text, textErr := instance.GetPageText(&requests.GetPageText{Page: page})
@@ -190,15 +127,8 @@ func (s *PDFScanner) scanPage(ctx context.Context, instance pdfium.Pdfium, page 
 		}
 		req.Image = *rendered.ImageBytes
 	}
-	response, err := s.client.ClassifySensitiveContent(ctx, req)
-	if err != nil || response == nil {
-		return result, false
-	}
-	result.Sensitivity = response.GetSensitivity()
-	result.Categories = response.GetCategories()
-	result.ContentKind = response.GetContentKind()
-	result.TestData = response.GetTestData()
-	return result, true
+	reviewed := classify(ctx, s.client, req, &result.Classification)
+	return result, reviewed
 }
 
 func limitUTF8(text string, maximum int) string {
