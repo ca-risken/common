@@ -67,6 +67,12 @@ func (s *findingScanSummary) addLegacyFinding(finding Finding) {
 
 func (s *findingScanSummary) addFile(file ScanResponse) {
 	s.complete = s.complete && file.Complete
+	if file.ZIP != nil {
+		for _, entry := range file.ZIP.Entries {
+			s.addFile(entry.Scan)
+		}
+		return
+	}
 	if file.PDFResult != nil {
 		s.complete = s.complete && len(file.Pages) > 0
 		for _, page := range file.Pages {

@@ -12,11 +12,22 @@ type ScanRequest struct {
 	Reader   io.Reader
 }
 
-// ScanResponse holds the classification of a file or its individual PDF pages.
+// ScanResponse holds the classification of a file, PDF pages, or files in a ZIP.
 type ScanResponse struct {
 	Complete bool `json:"complete"`
 	*Classification
 	*PDFResult
+	ZIP *ZIPResult `json:"zip,omitempty"`
+}
+
+type ZIPResult struct {
+	Entries   []ZIPEntry `json:"entries,omitempty"`
+	Truncated bool       `json:"truncated,omitzero"`
+}
+
+type ZIPEntry struct {
+	Name string       `json:"name"`
+	Scan ScanResponse `json:"scan"`
 }
 
 type Classification struct {

@@ -9,20 +9,34 @@ import (
 
 // FindingFile is the file-level classification written to Finding JSON.
 type FindingFile struct {
-	Input       string   `json:"input,omitempty"`
-	Complete    bool     `json:"complete"`
-	Truncated   bool     `json:"truncated,omitempty"`
-	Sensitivity *bool    `json:"-"`
-	ContentType []string `json:"content_type"`
-	ContentKind string   `json:"content_kind"`
-	TestData    *bool    `json:"test_data,omitzero"`
-	TotalPages  int      `json:"total_pages,omitempty"`
+	Input            string   `json:"input,omitempty"`
+	Complete         bool     `json:"complete"`
+	Truncated        bool     `json:"truncated,omitempty"`
+	Sensitivity      *bool    `json:"-"`
+	ContentType      []string `json:"content_type"`
+	ContentKind      string   `json:"content_kind"`
+	TestData         *bool    `json:"test_data,omitzero"`
+	TotalPages       int      `json:"total_pages,omitempty"`
+	SensitiveEntries []string `json:"sensitive_entries,omitempty"`
 }
 
-// NewFindingFile summarizes a scan as one file, including all of its reviewed PDF pages.
+// NewFindingFile summarizes a scan as one file, including reviewed PDF pages and ZIP entries.
 func NewFindingFile(scan ScanResponse) FindingFile {
 	file := FindingFile{Complete: scan.Complete, ContentKind: "UNSPECIFIED"}
 	file.applySummary(NewFindingScan([]ScanResponse{scan}, nil))
+	if scan.ZIP != nil {
+		file.Input = "zip"
+		file.ContentKind = "OTHER"
+		file.Truncated = scan.ZIP.Truncated
+		for _, entry := range scan.ZIP.Entries {
+			entryFinding := NewFindingFile(entry.Scan)
+			file.Truncated = file.Truncated || entryFinding.Truncated
+			if entryFinding.Sensitivity != nil && *entryFinding.Sensitivity {
+				file.SensitiveEntries = append(file.SensitiveEntries, entry.Name)
+			}
+		}
+		return file
+	}
 	if scan.PDFResult != nil {
 		file.Input = "pdf"
 		file.ContentKind = "DOCUMENT"
