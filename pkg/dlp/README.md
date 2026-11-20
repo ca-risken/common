@@ -6,4 +6,5 @@ Use `Scanner.Scan(ctx, ScanRequest{FileName: name, Reader: reader})` to classify
 - JPEG and PNG inputs must meet the Core limits of 2 MiB and a 2,048 px maximum edge.
 - For PDF files up to 5 MiB, PDFium WASM extracts text or renders JPEG images from the first 20 pages.
 
-Use `NewFindingScan` to convert classifications into the shared Finding summary fields.
+Use `NewFindingFile` to convert a scan to file-level Finding metadata with human-readable classification names. This combines the page decisions of a PDF into one file result. Use `NewFindingScan` to generate the shared Finding summary fields.
+Use the file's sensitivity decision to select detected files for Finding metadata. The serialized `test_data` field is Boolean and is omitted when unknown.
