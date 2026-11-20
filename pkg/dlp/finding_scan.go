@@ -24,56 +24,86 @@ func NewFindingScan(scan *ScanResult) *FindingScan {
 		return nil
 	}
 
-	result := &FindingScan{ScanResult: scan}
-	contentTypes := make(map[string]struct{})
-	hasSensitive := false
-	complete := len(scan.PDFScans) > 0
+	summary := findingScanSummary{
+		contentTypes:        make(map[string]struct{}),
+		complete:            len(scan.PDFScans) > 0,
+		allSensitiveAreTest: true,
+	}
 	for _, finding := range scan.Findings {
-		if contentType := legacyContentType(finding.Type); contentType != "" {
-			hasSensitive = true
-			contentTypes[contentType] = struct{}{}
-		} else {
-			complete = false
-		}
+		summary.addLegacyFinding(finding)
 	}
-
-	allSensitiveAreTest := !hasSensitive
-	hasNonTestData := false
 	for _, pdf := range scan.PDFScans {
-		complete = complete && pdf.Complete && len(pdf.Pages) > 0
-		for _, page := range pdf.Pages {
-			switch page.Sensitivity {
-			case ai.Sensitivity_SENSITIVITY_TRUE:
-				hasSensitive = true
-				hasNonTestData = hasNonTestData || page.TestData == ai.TestData_TEST_DATA_FALSE
-				allSensitiveAreTest = allSensitiveAreTest && page.TestData == ai.TestData_TEST_DATA_TRUE
-				for _, category := range page.Categories {
-					if category == ai.SensitiveContentCategory_SENSITIVE_CONTENT_CATEGORY_UNSPECIFIED {
-						continue
-					}
-					if name, ok := strings.CutPrefix(category.String(), "SENSITIVE_CONTENT_CATEGORY_"); ok {
-						contentTypes[name] = struct{}{}
-					}
-				}
-			case ai.Sensitivity_SENSITIVITY_FALSE:
-			default:
-				complete = false
-			}
-		}
+		summary.addPDFScan(pdf)
 	}
 
-	if hasSensitive || complete {
-		result.Sensitive = new(hasSensitive)
+	result := &FindingScan{ScanResult: scan}
+	if summary.hasSensitive || summary.complete {
+		result.Sensitive = new(summary.hasSensitive)
 	}
 	switch {
-	case hasNonTestData:
+	case summary.hasNonTestData:
 		result.TestData = new(false)
-	case hasSensitive && complete && allSensitiveAreTest:
+	case summary.hasSensitive && summary.complete && summary.allSensitiveAreTest:
 		result.TestData = new(true)
 	}
-	result.ContentType = slices.AppendSeq(make([]string, 0, len(contentTypes)), maps.Keys(contentTypes))
+	result.ContentType = slices.AppendSeq(make([]string, 0, len(summary.contentTypes)), maps.Keys(summary.contentTypes))
 	slices.Sort(result.ContentType)
 	return result
+}
+
+type findingScanSummary struct {
+	contentTypes        map[string]struct{}
+	complete            bool
+	hasSensitive        bool
+	allSensitiveAreTest bool
+	hasNonTestData      bool
+}
+
+func (s *findingScanSummary) addLegacyFinding(finding Finding) {
+	contentType := legacyContentType(finding.Type)
+	if contentType == "" {
+		s.complete = false
+		return
+	}
+
+	s.hasSensitive = true
+	s.allSensitiveAreTest = false
+	s.contentTypes[contentType] = struct{}{}
+}
+
+func (s *findingScanSummary) addPDFScan(pdf PDFScan) {
+	s.complete = s.complete && pdf.Complete && len(pdf.Pages) > 0
+	for _, page := range pdf.Pages {
+		s.addPDFPage(page)
+	}
+}
+
+func (s *findingScanSummary) addPDFPage(page PDFPage) {
+	if page.Sensitivity == ai.Sensitivity_SENSITIVITY_FALSE {
+		return
+	}
+	if page.Sensitivity != ai.Sensitivity_SENSITIVITY_TRUE {
+		s.complete = false
+		return
+	}
+
+	s.hasSensitive = true
+	s.hasNonTestData = s.hasNonTestData || page.TestData == ai.TestData_TEST_DATA_FALSE
+	s.allSensitiveAreTest = s.allSensitiveAreTest && page.TestData == ai.TestData_TEST_DATA_TRUE
+	s.addCategories(page.Categories)
+}
+
+func (s *findingScanSummary) addCategories(categories []ai.SensitiveContentCategory) {
+	for _, category := range categories {
+		if category == ai.SensitiveContentCategory_SENSITIVE_CONTENT_CATEGORY_UNSPECIFIED {
+			continue
+		}
+		name, ok := strings.CutPrefix(category.String(), "SENSITIVE_CONTENT_CATEGORY_")
+		if !ok {
+			continue
+		}
+		s.contentTypes[name] = struct{}{}
+	}
 }
 
 func legacyContentType(findingType string) string {

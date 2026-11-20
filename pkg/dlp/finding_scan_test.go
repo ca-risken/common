@@ -54,6 +54,11 @@ func TestNewFindingScan(t *testing.T) {
 			want: FindingScan{ContentType: []string{}},
 		},
 		{
+			name: "incomplete scan retains sensitive evidence",
+			scan: ScanResult{PDFScans: []PDFScan{{Pages: []PDFPage{testPage}}}},
+			want: FindingScan{Sensitive: new(true), ContentType: []string{"CLIENT_DATA", "PII"}},
+		},
+		{
 			name: "unknown page prevents the all-test conclusion",
 			scan: ScanResult{PDFScans: []PDFScan{{Complete: true, Pages: []PDFPage{testPage, {}}}}},
 			want: FindingScan{Sensitive: new(true), ContentType: []string{"CLIENT_DATA", "PII"}},
