@@ -17,6 +17,7 @@ type ScanResult struct {
 	ScanTime       int64     `json:"scan_time"` // Unix timestamp
 	TotalSeverity  string    `json:"total_severity"`
 	SeverityReason string    `json:"severity_reason"`
+	PDFScans       []PDFScan `json:"pdf_scans,omitempty"`
 }
 
 // Finding represents an individual DLP finding
