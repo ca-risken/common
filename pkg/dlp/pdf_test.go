@@ -3,6 +3,7 @@ package dlp
 import (
 	"bytes"
 	"context"
+	json "encoding/json/v2"
 	"errors"
 	"fmt"
 	"image/jpeg"
@@ -60,8 +61,15 @@ func TestPDFScanner(t *testing.T) {
 	want := PDFScan{
 		Object: "folder/test.pdf", TotalPages: 2, Complete: true,
 		Pages: []PDFPage{
-			{Number: 1, Input: "text", Sensitivity: "TRUE", Categories: []string{"CREDENTIAL"}, ContentKind: "DOCUMENT", TestData: "TRUE"},
-			{Number: 2, Input: "image", Sensitivity: "FALSE", TestData: "UNKNOWN"},
+			{
+				Number:      1,
+				Input:       "text",
+				Sensitivity: ai.Sensitivity_SENSITIVITY_TRUE,
+				Categories:  []ai.SensitiveContentCategory{ai.SensitiveContentCategory_SENSITIVE_CONTENT_CATEGORY_CREDENTIAL},
+				ContentKind: ai.ContentKind_CONTENT_KIND_DOCUMENT,
+				TestData:    ai.TestData_TEST_DATA_TRUE,
+			},
+			{Number: 2, Input: "image", Sensitivity: ai.Sensitivity_SENSITIVITY_FALSE},
 		},
 	}
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -69,6 +77,18 @@ func TestPDFScanner(t *testing.T) {
 	}
 	if diff := cmp.Diff([]string{"text", "image"}, inputs); diff != "" {
 		t.Errorf("Core calls mismatch (-want +got):\n%s", diff)
+	}
+
+	encoded, err := json.Marshal(got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cached PDFScan
+	if err := json.Unmarshal(encoded, &cached); err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, cached); diff != "" {
+		t.Errorf("cached PDF scan mismatch (-want +got):\n%s", diff)
 	}
 }
 

@@ -43,14 +43,15 @@ type PDFObject struct {
 	Open    func(context.Context) (io.ReadCloser, error)
 }
 
+// PDFPage keeps the Core enum types. The cached JSON uses their numeric values.
 type PDFPage struct {
-	Number      int      `json:"number"`
-	Input       string   `json:"input,omitempty"`
-	Truncated   bool     `json:"truncated,omitempty"`
-	Sensitivity string   `json:"sensitivity"`
-	Categories  []string `json:"categories,omitempty"`
-	ContentKind string   `json:"content_kind,omitempty"`
-	TestData    string   `json:"test_data,omitempty"`
+	Number      int                           `json:"number"`
+	Input       string                        `json:"input,omitempty"`
+	Truncated   bool                          `json:"truncated,omitempty"`
+	Sensitivity ai.Sensitivity                `json:"sensitivity"`
+	Categories  []ai.SensitiveContentCategory `json:"categories,omitempty"`
+	ContentKind ai.ContentKind                `json:"content_kind,omitzero"`
+	TestData    ai.TestData                   `json:"test_data,omitzero"`
 }
 
 type PDFScanner struct {
@@ -168,7 +169,7 @@ func (s *PDFScanner) Scan(ctx context.Context, object string, reader io.Reader) 
 }
 
 func (s *PDFScanner) scanPage(ctx context.Context, instance pdfium.Pdfium, page requests.Page, fileName string) (PDFPage, bool) {
-	result := PDFPage{Sensitivity: "UNKNOWN"}
+	var result PDFPage
 	req := &ai.ClassifySensitiveContentRequest{FileName: fileName}
 	text, textErr := instance.GetPageText(&requests.GetPageText{Page: page})
 	if textErr == nil && strings.TrimSpace(text.Text) != "" {
@@ -193,14 +194,10 @@ func (s *PDFScanner) scanPage(ctx context.Context, instance pdfium.Pdfium, page 
 	if err != nil || response == nil {
 		return result, false
 	}
-	result.Sensitivity = strings.TrimPrefix(response.GetSensitivity().String(), "SENSITIVITY_")
-	for _, category := range response.GetCategories() {
-		result.Categories = append(result.Categories, strings.TrimPrefix(category.String(), "SENSITIVE_CONTENT_CATEGORY_"))
-	}
-	if response.GetContentKind() != ai.ContentKind_CONTENT_KIND_UNSPECIFIED {
-		result.ContentKind = strings.TrimPrefix(response.GetContentKind().String(), "CONTENT_KIND_")
-	}
-	result.TestData = strings.TrimPrefix(response.GetTestData().String(), "TEST_DATA_")
+	result.Sensitivity = response.GetSensitivity()
+	result.Categories = response.GetCategories()
+	result.ContentKind = response.GetContentKind()
+	result.TestData = response.GetTestData()
 	return result, true
 }
 
