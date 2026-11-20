@@ -1,26 +1,44 @@
 package dlp
 
-// Severity level constants
-const (
-	SeverityLow      = "LOW"
-	SeverityMedium   = "MEDIUM"
-	SeverityHigh     = "HIGH"
-	SeverityCritical = "CRITICAL"
+import (
+	"io"
+
+	"github.com/ca-risken/core/proto/ai"
 )
 
-// ScanResult represents the complete DLP scan result
-type ScanResult struct {
-	ResourceName   string    `json:"resource_name"`
-	TotalFiles     int       `json:"total_files"`
-	Findings       []Finding `json:"findings"`
-	ScanDuration   string    `json:"scan_duration"`
-	ScanTime       int64     `json:"scan_time"` // Unix timestamp
-	TotalSeverity  string    `json:"total_severity"`
-	SeverityReason string    `json:"severity_reason"`
-	PDFScans       []PDFScan `json:"pdf_scans,omitempty"`
+// ScanRequest represents the name and contents of one file.
+type ScanRequest struct {
+	FileName string
+	Reader   io.Reader
 }
 
-// Finding represents an individual DLP finding
+// ScanResponse holds the classification of a file or its individual PDF pages.
+type ScanResponse struct {
+	Complete bool `json:"complete"`
+	*Classification
+	*PDFResult
+}
+
+type Classification struct {
+	Input       string                        `json:"input,omitempty"`
+	Truncated   bool                          `json:"truncated,omitempty"`
+	Sensitivity ai.Sensitivity                `json:"sensitivity"`
+	Categories  []ai.SensitiveContentCategory `json:"categories,omitempty"`
+	ContentKind ai.ContentKind                `json:"content_kind,omitzero"`
+	TestData    ai.TestData                   `json:"test_data,omitzero"`
+}
+
+type PDFResult struct {
+	TotalPages int       `json:"total_pages,omitempty"`
+	Pages      []PDFPage `json:"pages,omitempty"`
+}
+
+type PDFPage struct {
+	Number int `json:"number"`
+	Classification
+}
+
+// Finding represents a previously stored directory scanner match.
 type Finding struct {
 	FilePath    string   `json:"file_path"`
 	Type        string   `json:"type"`
@@ -30,42 +48,7 @@ type Finding struct {
 	Description string   `json:"description"`
 }
 
-// Config represents the complete DLP configuration
 type Config struct {
-	MaxScanFiles         int                 `yaml:"max_scan_files" validate:"required,gt=0"`
-	MaxScanSizeMB        int                 `yaml:"max_scan_size_mb" validate:"required,gt=0"`
-	MaxSingleFileSizeMB  int                 `yaml:"max_single_file_size_mb" validate:"required,gt=0"`
-	MaxMatchesPerFinding int                 `yaml:"max_matches_per_finding" validate:"required,gt=0"`
-	ExcludeFilePatterns  []string            `yaml:"exclude_file_patterns"`
-	FingerprintFilePath  string              `yaml:"fingerprint_file_path,omitempty"`
-	Rules                []Rule              `yaml:"rules,omitempty" validate:"dive"`
-}
-
-// Rule represents a single DLP rule
-type Rule struct {
-	Name               string              `yaml:"name" validate:"required,min=1"`
-	Description        string              `yaml:"description"`
-	Type               string              `yaml:"type"`
-	FileFilters        *FileFilters        `yaml:"file_filters,omitempty"`
-	SeverityThresholds *SeverityThresholds `yaml:"severity_thresholds,omitempty"`
-}
-
-// FileFilters defines file metadata conditions for applying a rule
-type FileFilters struct {
-	IncludeExtensions []string `yaml:"include_extensions,omitempty"`
-	ExcludeFileName   []string `yaml:"exclude_file_name,omitempty"`
-	MinSizeKB         *int     `yaml:"min_size_kb,omitempty"`
-}
-
-// SeverityThresholds defines match count thresholds for different severity levels
-type SeverityThresholds struct {
-	Critical *int `yaml:"critical,omitempty"`
-	High     *int `yaml:"high,omitempty"`
-	Medium   *int `yaml:"medium,omitempty"`
-	Low      *int `yaml:"low,omitempty"`
-}
-
-// hawkEyeOutput represents the complete hawk-eye JSON output structure (internal use only)
-type hawkEyeOutput struct {
-	Fs []Finding `json:"fs"`
+	MaxSingleFileSizeMB int      `yaml:"max_single_file_size_mb" validate:"required,gt=0"`
+	ExcludeFilePatterns []string `yaml:"exclude_file_patterns"`
 }

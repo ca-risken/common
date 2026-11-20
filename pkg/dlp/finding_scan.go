@@ -8,35 +8,29 @@ import (
 	"github.com/ca-risken/core/proto/ai"
 )
 
-// FindingScan is the shared dlp_scan JSON payload. It includes the scan
-// details needed to reuse results, plus a summary for Finding consumers.
+// FindingScan is the shared classification summary for Finding consumers.
 type FindingScan struct {
-	*ScanResult
 	Sensitive   *bool    `json:"sensitive"`
 	ContentType []string `json:"content_type"`
 	TestData    *bool    `json:"test_data"`
 }
 
-// NewFindingScan summarizes known sensitive matches and PDF page decisions.
-// Unknown or incomplete evidence leaves the corresponding flag null.
-func NewFindingScan(scan *ScanResult) *FindingScan {
-	if scan == nil {
-		return nil
-	}
-
+// NewFindingScan converts file decisions and previously stored matches to a
+// Finding summary. Unknown or incomplete evidence leaves the corresponding flag null.
+func NewFindingScan(files []ScanResponse, previousFindings []Finding) FindingScan {
 	summary := findingScanSummary{
 		contentTypes:        make(map[string]struct{}),
-		complete:            len(scan.PDFScans) > 0,
+		complete:            len(files) > 0,
 		allSensitiveAreTest: true,
 	}
-	for _, finding := range scan.Findings {
+	for _, finding := range previousFindings {
 		summary.addLegacyFinding(finding)
 	}
-	for _, pdf := range scan.PDFScans {
-		summary.addPDFScan(pdf)
+	for _, file := range files {
+		summary.addFile(file)
 	}
 
-	result := &FindingScan{ScanResult: scan}
+	var result FindingScan
 	if summary.hasSensitive || summary.complete {
 		result.Sensitive = new(summary.hasSensitive)
 	}
@@ -71,26 +65,35 @@ func (s *findingScanSummary) addLegacyFinding(finding Finding) {
 	s.contentTypes[contentType] = struct{}{}
 }
 
-func (s *findingScanSummary) addPDFScan(pdf PDFScan) {
-	s.complete = s.complete && pdf.Complete && len(pdf.Pages) > 0
-	for _, page := range pdf.Pages {
-		s.addPDFPage(page)
-	}
-}
-
-func (s *findingScanSummary) addPDFPage(page PDFPage) {
-	if page.Sensitivity == ai.Sensitivity_SENSITIVITY_FALSE {
+func (s *findingScanSummary) addFile(file ScanResponse) {
+	s.complete = s.complete && file.Complete
+	if file.PDFResult != nil {
+		s.complete = s.complete && len(file.Pages) > 0
+		for _, page := range file.Pages {
+			s.addClassification(page.Classification)
+		}
 		return
 	}
-	if page.Sensitivity != ai.Sensitivity_SENSITIVITY_TRUE {
+	if file.Classification == nil {
+		s.complete = false
+		return
+	}
+	s.addClassification(*file.Classification)
+}
+
+func (s *findingScanSummary) addClassification(result Classification) {
+	if result.Sensitivity == ai.Sensitivity_SENSITIVITY_FALSE {
+		return
+	}
+	if result.Sensitivity != ai.Sensitivity_SENSITIVITY_TRUE {
 		s.complete = false
 		return
 	}
 
 	s.hasSensitive = true
-	s.hasNonTestData = s.hasNonTestData || page.TestData == ai.TestData_TEST_DATA_FALSE
-	s.allSensitiveAreTest = s.allSensitiveAreTest && page.TestData == ai.TestData_TEST_DATA_TRUE
-	s.addCategories(page.Categories)
+	s.hasNonTestData = s.hasNonTestData || result.TestData == ai.TestData_TEST_DATA_FALSE
+	s.allSensitiveAreTest = s.allSensitiveAreTest && result.TestData == ai.TestData_TEST_DATA_TRUE
+	s.addCategories(result.Categories)
 }
 
 func (s *findingScanSummary) addCategories(categories []ai.SensitiveContentCategory) {
