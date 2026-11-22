@@ -676,6 +676,7 @@ CREATE TABLE code_gitleaks_setting (
   scan_public ENUM('false', 'true') NOT NULL DEFAULT 'true',
   scan_internal ENUM('false', 'true') NOT NULL DEFAULT 'true',
   scan_private ENUM('false', 'true') NOT NULL DEFAULT 'false',
+  ai_scan BOOLEAN NOT NULL DEFAULT FALSE,
   status ENUM('UNKNOWN', 'OK' ,'CONFIGURED', 'IN_PROGRESS', 'ERROR') NOT NULL DEFAULT 'UNKNOWN',
   status_detail VARCHAR(255) NULL,
   scan_at DATETIME NULL,
