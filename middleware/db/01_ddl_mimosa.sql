@@ -448,7 +448,8 @@ CREATE TABLE report_finding (
   score FLOAT(3,2) UNSIGNED NOT NULL,
   count INT UNSIGNED NOT NULL,
   PRIMARY KEY(report_finding_id),
-  UNIQUE KEY uidx_report_finding (report_date, project_id, data_source, score)
+  UNIQUE KEY uidx_report_finding (report_date, project_id, data_source, score),
+  KEY idx_report_finding_project_date (project_id, report_date)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin AUTO_INCREMENT = 1001;
 
 CREATE TABLE report (
